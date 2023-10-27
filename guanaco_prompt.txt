@@ -1,1 +1,1 @@
-### Human {{ instruction }}### Assistant:
+### Human: {{ instruction }}### Assistant:

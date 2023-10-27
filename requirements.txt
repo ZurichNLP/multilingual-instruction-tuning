@@ -17,6 +17,7 @@ rouge_score
 sacrebleu
 sacremoses
 safetensors>=0.3.1
+scipy
 seaborn
 tokenizers
 transformers==4.34.0

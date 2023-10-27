@@ -13,6 +13,59 @@ Example call:
         --tgt_lang "German" \
         --src_key "instruction"
         
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval_instructions_ru.json \
+        --tgt_lang "Russian" \
+        --src_key "instruction"
+
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval_instructions_hi.json \
+        --tgt_lang "Hindi" \
+        --src_key "instruction"
+
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval_instructions_fr.json \
+        --tgt_lang "French" \
+        --src_key "instruction"
+
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval_instructions_zh.json \
+        --tgt_lang "Mandarin Chinese" \
+        --src_key "instruction"
+
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval_instructions_el.json \
+        --tgt_lang "standard modern Greek" \
+        --src_key "instruction"
+
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval_instructions_is.json \
+        --tgt_lang "Icelandic" \
+        --src_key "instruction"
+
+
+    python translate_with_gpt.py \
+        --input_file data/lima_train_en.json \
+        --output_file data/lima_train_de.json \
+        --tgt_lang "German" \
+        --src_key "text" \
+        --dataset_type "lima" \
+        --model_name "gpt-3.5-turbo-16k"
+
+    python translate_with_gpt.py \
+        --input_file data/lima_test_en.json \
+        --output_file data/lima_test_hi.json \
+        --tgt_lang "Hindi" \
+        --src_key "text" \
+        --dataset_type "lima" \
+        --model_name "gpt-3.5-turbo-16k"
+        
 """
 
 import json
@@ -30,18 +83,40 @@ from langchain.schema import (
 from langchain.prompts.chat import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain import LLMChain
 from langchain.callbacks import get_openai_callback
+import tiktoken
 
 from api_secrets import OPENAI_API_KEY
 
 system_prompt = "You are a helpful assistant."
 
-human_template = """Translate the following text into {tgt_lang}. Keep the structure of the original text and preserve things like code and names. Please ensure that your response contain only the translated text. The translation must convey the same meaning as the original and be natural for native speakers with correct grammar and proper word choices. Your translation must also use exact terminology to provide accurate information even for the experts in the related fields.
+human_template = """Translate the following text into {tgt_lang}. 
+Keep the structure of the original text and preserve things like code and names. 
+Please ensure that your response contains only the translated text. 
+The translation must convey the same meaning as the original and be natural for native speakers with correct grammar and proper word choices. 
+Your translation must also use exact terminology to provide accurate information even for the experts in the related fields.
 
 Original: "{prompt}"
 
 Translation into {tgt_lang}:"""
 
+lima_human_template = """Translate the following conversation between a human and an AI assistant into {tgt_lang}. 
+Keep the structure of the original text and preserve things like code, names and role labels (e.g. ### Human:, ### Assistant:).
+Please ensure that your response contains only the translated text. 
+The translation must convey the same meaning as the original and be natural for native speakers with correct grammar and proper word choices. 
+Your translation must also use exact terminology to provide accurate information even for the experts in the related fields.
 
+Original: 
+
+{prompt}
+
+Translation into {tgt_lang}:"""
+
+
+costings = {
+    "gpt-3.5-turbo": 0.002, # $0.002 per output token (input tokens are slightly cheaper)
+    "gpt-3.5-turbo-16k": 0.004,
+    "gpt-4": 0.06, # 8k context
+}
 
 
 def set_args():
@@ -53,6 +128,7 @@ def set_args():
     ap.add_argument("--tgt_lang", type=str, default="de")
     ap.add_argument("--debug", action="store_true")
     ap.add_argument("--max_tokens", type=int, default=2048)
+    ap.add_argument("--dataset_type", type=str, default="alpaca_eval")
     return ap.parse_args()
 
 def prepare_prompt(prompt, tgt_lang, human_template, system_prompt):
@@ -97,7 +173,19 @@ if __name__ == "__main__":
 
     instructions = data[args.src_key].tolist()
     
-    prompts = [prepare_prompt(i, args.tgt_lang, human_template, system_prompt) for i in instructions]
+    if args.dataset_type == "alpaca_eval":
+        prompts = [prepare_prompt(i, args.tgt_lang, human_template, system_prompt) for i in instructions]
+    elif args.dataset_type == "lima":
+        prompts = [prepare_prompt(i, args.tgt_lang, lima_human_template, system_prompt) for i in instructions]
+
+    # estimate number of tokens
+    tokenizer = tiktoken.encoding_for_model(args.model_name)
+    prompt_lengths = [len(tokenizer.encode(prompt[0].content + '\n\n' + prompt[1].content)) for prompt in prompts]
+    print(f"Total tokens: {sum(prompt_lengths)}")
+    print(f'Average tokens per prompt: {sum(prompt_lengths)/len(prompt_lengths)}')
+    print(f'Max tokens per prompt: {max(prompt_lengths)}')
+    print(f'Min tokens per prompt: {min(prompt_lengths)}')
+    print(f'Rough estimated cost: {((sum(prompt_lengths) * 2) / 1000) * costings[args.model_name]}')
 
     if args.debug:
         prompts = prompts[:5]

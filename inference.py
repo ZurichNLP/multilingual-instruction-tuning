@@ -102,7 +102,6 @@ def truncate_text(input_text, tokenizer, max_input_length, truncate_from_start: 
     
 def prepare_inputs_for_generation(
         input_texts: List[str], 
-        context_texts: Optional[List[List[str]]] = None, 
         prompt_template: Environment = None,
         tokenizer = None,
         max_input_length: int = 1024,
@@ -113,15 +112,14 @@ def prepare_inputs_for_generation(
 
     """
 
-    # string leading and trailing quotes from input texts
+    # strip leading and trailing quotes from input texts if present (artifact from gpt3-translation format)
     input_texts_ = []
     for i in input_texts:
         if i[0] == '"' and i[-1] == '"':
-            input_texts_.append(i[1:-1])
+            input_texts_.append(i[1:-1]) # remove leading and trailing quotes
+        else:
+            input_texts_.append(i) # do nothing
 
-    # if context_texts:
-    #     prompted_input_texts = [prompt_template.render(instruction=input_texts[i], context_message=context_texts[i]) for i in range(len(input_texts))]
-    # else:
     prompted_input_texts = [prompt_template.render(instruction=input_texts[i]) for i in range(len(input_texts_))]
 
     prompted_input_texts = [truncate_text(i, tokenizer, max_input_length, truncate_from_start) for i in prompted_input_texts]
@@ -148,11 +146,6 @@ def main(args):
     with open(Path(output_file).with_suffix('.json'), 'w', encoding='utf-8') as f:
         json.dump(vars(args), f, indent=4)
         logger.info(f'Arguments written to {Path(output_file).with_suffix(".json")}')
-
-    # formatter_key = args.prompt_format if args.prompt_format is not None else Path(args.model_name_or_path).name.lower()
-    # formatter = formatters.model_formatter_map.get(formatter_key, "default")()
-    # logger.info(f"Using prompt formatter: {formatter.__class__.__name__}")
-    # formatted_inputs = [formatter.format(human_message=i) for i in inputs]
     
     prompts_dir = Path(args.prompt_format).parent.absolute()
     prompt_name = Path(args.prompt_format).stem
@@ -174,7 +167,6 @@ def main(args):
         logprobs=args.logprobs,
         )
 
-
     # load the model    
     llm = load_model(args.model_name_or_path, args.n_gpus, args.seed)
     
@@ -193,40 +185,34 @@ def main(args):
         if args.tgt_key and args.tgt_key in batch_lines[0]:
             ref_texts = [line[args.tgt_key] for line in batch_lines]
         
-        context_texts = None
-        # if args.ctx_key:
-        #     if args.ctx_key in batch_lines[0]:
-        #         context_texts = []
-        #         for line in batch_lines:
-        #             context_texts.append([i['page_content'] for i in line[args.ctx_key]])
-        #     else:
-        #         logger.warning(
-        #             f'`--ctx_key` argument was provided as "{args.ctx_key}" '
-        #             f'but was not found in input file! Context will not be used.'
-        #             )
-        
         # Write predictions to file
         with open(output_file, 'a', encoding='utf-8') as f:
             
             batch_inputs = prepare_inputs_for_generation(
                 input_texts=input_texts, 
-                context_texts=context_texts, 
                 prompt_template=prompt_template, 
                 tokenizer=llm.get_tokenizer(),
                 max_input_length=args.max_input_length,
                 truncate_from_start=args.truncate_from_start,
                 )
 
+            if batch_inputs == []:
+                raise ValueError("batch_inputs is empty!")
+            
             if args.verbose:
                 logger.info(f"Current batch (1/{len(batch_inputs)}): {batch_inputs[0]}")
 
             start_time = time.time()
             batch_outputs = generate(llm, batch_inputs, args.batch_size, sampling_params, use_tqdm=False)
+
+            if len(batch_outputs) != len(batch_inputs):
+                raise ValueError("batch_outputs and batch_inputs have different lengths!")
+            
             end_time = time.time()
             # add the original source texts to the outputs dict
             for i, output_dict in enumerate(batch_outputs):
                 output_dict["source"] = input_texts[i]
-                output_dict["contexts"] = context_texts[i] if context_texts else None
+                # output_dict["contexts"] = context_texts[i] if context_texts else None
                 output_dict["secs"] = ((end_time - start_time) / len(batch_outputs))
                 if ref_texts:
                     output_dict["reference"] = ref_texts[i]
