@@ -7,9 +7,14 @@ python check_experiment_files.py -i data/outputs
 """
 
 import argparse
+import re
 from pathlib import Path
 import pandas as pd
 from collections import defaultdict
+
+def get_expected_test_sets(dir_path):
+    expected_test_sets = [f.stem for f in Path(dir_path).glob('alpaca_eval_instructions_*.json')]
+    return expected_test_sets
 
 def quick_lc(file: Path):
     with open(file, 'r') as f:
@@ -51,14 +56,29 @@ def gather_existing_files(model_outputs_dir: str):
     print(f"{model_outputs_dir}: Outputs: {len(files['output_files'])}\tEvals: {len(files['eval_files'])}\tLLM Evals: {len(files['llm_eval_files'])}\tParams: {len(files['param_files'])}")
     return files
 
-def main(dir: str):
+def main(dir_path: str):
+    expected_seeds = [0, 42, 723]
+    expected_test_sets = get_expected_test_sets(Path(dir_path).parent)
+    print(f"*** {len(expected_test_sets) * len(expected_seeds)} expected total inference runs for test sets {expected_test_sets} and seeds {expected_seeds} ***")
+
     model_files = {}
-    for model_outputs_dir in Path(dir).iterdir():
+    for model_outputs_dir in Path(dir_path).iterdir():
         model_files[model_outputs_dir.name] = gather_existing_files(model_outputs_dir)
-    
+
+        # # check that all expected test sets * expected seeds are present
+        # for test_set in expected_test_sets:
+        #     for seed in expected_seeds:
+        #         for filename in model_files[model_outputs_dir.name]['output_files']:
+        #             _, ftest_set, _, fseed = parse_filename(filename)
+        #             breakpoint()
+        #             if test_set == ftest_set and seed == fseed:
+        #                 break
+        #         print(f"Missing eval file for {test_set} and seed {seed} in {model_outputs_dir.name}")
+            
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('-i', '--indir', default='data/outputs', type=str, help='Directory containing experiment results')
     args = ap.parse_args()
+
 
     main(args.indir)

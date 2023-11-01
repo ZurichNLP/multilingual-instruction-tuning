@@ -49,6 +49,51 @@ Example call:
         --tgt_lang "Icelandic" \
         --src_key "instruction"
 
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval_instructions_sv.json \
+        --tgt_lang "Swedish" \
+        --src_key "instruction"
+
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval_instructions_da.json \
+        --tgt_lang "Danish" \
+        --src_key "instruction"
+        
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval_instructions_es.json \
+        --tgt_lang "Spanish" \
+        --src_key "instruction"
+
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval_instructions_ca.json \
+        --tgt_lang "Catalan" \
+        --src_key "instruction"
+
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval_instructions_no.json \
+        --tgt_lang "Norwegian Bokmål" \
+        --src_key "instruction"
+
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval_instructions_bg.json \
+        --tgt_lang "Bulgarian" \
+        --src_key "instruction"
+
+    python translate_with_gpt.py \
+        --input_file data/guanaco_train_mono_1k_en.json \
+        --output_file data/guanaco_train_mono_1k_zh.json \
+        --tgt_lang "Mandarin Chinese" \
+        --src_key "text" \
+        --dataset_type "guanaco" \
+        --model_name "gpt-3.5-turbo"
+    
+    
 
     python translate_with_gpt.py \
         --input_file data/lima_train_en.json \
@@ -100,7 +145,19 @@ Original: "{prompt}"
 Translation into {tgt_lang}:"""
 
 lima_human_template = """Translate the following conversation between a human and an AI assistant into {tgt_lang}. 
-Keep the structure of the original text and preserve things like code, names and role labels (e.g. ### Human:, ### Assistant:).
+Keep the structure of the original text and preserve things like code, names and role labels (e.g. <S1>, <S2>).
+Please ensure that your response contains only the translated text. 
+The translation must convey the same meaning as the original and be natural for native speakers with correct grammar and proper word choices. 
+Your translation must also use exact terminology to provide accurate information even for the experts in the related fields.
+
+Original: 
+
+{prompt}
+
+Translation into {tgt_lang}:"""
+
+guanaco_human_template = """Translate the following conversation between a human and an AI assistant into {tgt_lang}. 
+Keep the structure of the original text and preserve things like code, names and role labels (e.g. <S1>, <S2>).
 Please ensure that your response contains only the translated text. 
 The translation must convey the same meaning as the original and be natural for native speakers with correct grammar and proper word choices. 
 Your translation must also use exact terminology to provide accurate information even for the experts in the related fields.
@@ -127,6 +184,7 @@ def set_args():
     ap.add_argument("--src_key", type=str, default="instruction")
     ap.add_argument("--tgt_lang", type=str, default="de")
     ap.add_argument("--debug", action="store_true")
+    ap.add_argument("--inspect_only", action="store_true")
     ap.add_argument("--max_tokens", type=int, default=2048)
     ap.add_argument("--dataset_type", type=str, default="alpaca_eval")
     return ap.parse_args()
@@ -148,7 +206,8 @@ def run_llm(prompts, model_name="gpt-3.5-turbo", max_tokens=1000):
         model_name=model_name,
         temperature=0.01,
         max_tokens=max_tokens,
-        openai_api_key=OPENAI_API_KEY
+        openai_api_key=OPENAI_API_KEY,
+        request_timeout=60,
         )
 
     responses = []
@@ -176,7 +235,15 @@ if __name__ == "__main__":
     if args.dataset_type == "alpaca_eval":
         prompts = [prepare_prompt(i, args.tgt_lang, human_template, system_prompt) for i in instructions]
     elif args.dataset_type == "lima":
+        # replace original role labels with <S1> and <S2> for better translation
+        instructions = [i.replace("### Human:", "<S1>").replace("### Assistant:", "<S2>") for i in instructions]
         prompts = [prepare_prompt(i, args.tgt_lang, lima_human_template, system_prompt) for i in instructions]
+    elif args.dataset_type == "guanaco":
+        # replace original role labels with <S1> and <S2> for better translation
+        instructions = [i.replace("### Human:", "<S1>").replace("### Assistant:", "<S2>") for i in instructions]
+        prompts = [prepare_prompt(i, args.tgt_lang, guanaco_human_template, system_prompt) for i in instructions]
+    else:
+        raise ValueError(f"Unknown dataset type: {args.dataset_type}")
 
     # estimate number of tokens
     tokenizer = tiktoken.encoding_for_model(args.model_name)
@@ -186,6 +253,9 @@ if __name__ == "__main__":
     print(f'Max tokens per prompt: {max(prompt_lengths)}')
     print(f'Min tokens per prompt: {min(prompt_lengths)}')
     print(f'Rough estimated cost: {((sum(prompt_lengths) * 2) / 1000) * costings[args.model_name]}')
+
+    if args.inspect_only:
+        exit()
 
     if args.debug:
         prompts = prompts[:5]

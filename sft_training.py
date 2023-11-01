@@ -74,7 +74,7 @@ class ScriptArguments:
     )
 
     save_total_limit: Optional[int] = field(
-        default=3,
+        default=10,
         metadata={"help": "The maximum number of checkpoints to save."},
     )
 

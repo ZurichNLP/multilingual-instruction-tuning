@@ -126,6 +126,12 @@ def main(args):
 
     logger.info(f"Read {len(data[args.src_key])} lines from {args.input_file}")
     
+    if 'alpaca_eval_instructions' in args.input_file and len(data) != 805:
+        raise ValueError(
+            f"Wrong number of samples in input file. "
+            f"Expected 805 samples in {args.input_file}, but got {len(data)}."
+            )
+
     if args.src_key is not None and args.src_key in data.columns:
         src_sents = data[args.src_key].to_list()
     else:
@@ -172,6 +178,7 @@ def main(args):
         metrics['ppl'] = None
     
     # add filename
+    metrics['n'] = len(sys_sents)
     metrics['file'] = args.input_file
 
     metrics = pd.DataFrame(metrics, index=[0]).round(3)

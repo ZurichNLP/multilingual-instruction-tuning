@@ -7,16 +7,17 @@ Example usage:
     python llm_judge.py \
         --input_file data/outputs/llama_2_7b_hf_zh_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
         --limit 3
-        
+        --force
 
 """
 
-
+import sys
 import json
 import argparse
 import time
 from typing import Dict, List
 from tqdm import tqdm
+from pathlib import Path
 import pandas as pd
 
 from langchain.chat_models import ChatOpenAI
@@ -82,7 +83,8 @@ def set_args():
     ap.add_argument("--seed", required=False, type=int, default=42, help="Random seed for sampling items")
     ap.add_argument("--src_key", required=False, type=str, default="source", help="Source key")
     ap.add_argument("--tgt_key", required=False, type=str, default="system", help="Target key")
-    ap.add_argument("--sleep_time", required=False, type=int, default=4, help="Sleep time between requests (e.g. for GPT-4)")
+    ap.add_argument("--sleep_time", required=False, type=int, default=6, help="Sleep time between requests (e.g. for GPT-4)")
+    ap.add_argument("--force", required=False, type=str2bool, default=False, help="Overwrites existing outputs if found, otherwise skip.")
     return ap.parse_args()
 
 def prepare_prompts(prompt, response, human_template=human_template, system_prompt=system_prompt):
@@ -102,7 +104,8 @@ def get_llm_judgements(prompts, model_name="gpt-3.5-turbo", max_tokens=1000, sle
         model_name=model_name,
         temperature=0.0,
         max_tokens=max_tokens,
-        openai_api_key=OPENAI_API_KEY
+        openai_api_key=OPENAI_API_KEY,
+        # request_timeout=120,
         )
 
     logger.info(f"Model: {model_name}")
@@ -110,6 +113,8 @@ def get_llm_judgements(prompts, model_name="gpt-3.5-turbo", max_tokens=1000, sle
         
         if model_name == "gpt-4":
             time.sleep(sleep_time)
+        # else:
+        #     time.sleep(2.5)
 
         with get_openai_callback() as cb:
             response = model.generate([prompt])
@@ -118,7 +123,7 @@ def get_llm_judgements(prompts, model_name="gpt-3.5-turbo", max_tokens=1000, sle
 
             logger.info(f"Progress: {i+1}/{len(prompts)}, Total cost: {total_cost}, Total tokens: {total_tokens}")
         
-        yield response.generations[0][0].text
+        yield response.generations[0][0].text, cb.total_cost
 
 
 def parse_string_to_json(string):
@@ -166,18 +171,24 @@ if __name__ == "__main__":
         output_file = args.input_file.replace(".jsonl", f"-{args.model_name.replace('-', '_')}-l{len(data)}.llm_eval")
     logger.info(f"Output file: {output_file}")
 
+    if Path(output_file).exists() and not args.force:
+        logger.warning(f"Output file already exists. Use --force to overwrite.")
+        sys.exit(1)
+
     query_prompts = [prepare_prompts(strip_quotes(p), strip_quotes(r)) for p, r in zip(data[args.src_key], data[args.tgt_key])]
     logger.info(f"Model: {args.model_name}")
     logger.info(f"# Prompts: {len(data)}")
     logger.info(f"Output file: {output_file}")
 
     data[f'{args.model_name}-judgement'], data[f'{args.model_name}-justification'] = None, None
-    
-    for i, result in tqdm(enumerate(get_llm_judgements(query_prompts, model_name=args.model_name, max_tokens=args.max_tokens, sleep_time=args.sleep_time)), total=len(data)):
-        print(query_prompts[i])
+    data[f'{args.model_name}-cost'] = None
+
+    for i, (result, cost) in tqdm(enumerate(get_llm_judgements(query_prompts, model_name=args.model_name, max_tokens=args.max_tokens, sleep_time=args.sleep_time)), total=len(data)):
+        # print(query_prompts[i])
         result = parse_string_to_json(result)
         data.loc[i, f'{args.model_name}-judgement'] = result.get("judgement")
         data.loc[i, f'{args.model_name}-justification'] = result.get("justification")
+        data.loc[i, f'{args.model_name}-cost'] = cost
 
     data.to_json(output_file, orient='records', lines=True, force_ascii=False)
 

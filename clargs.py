@@ -64,6 +64,7 @@ def inference_args_parser():
     ap.add_argument("--max_tokens", default=1024, type=int, help="Max output tokens before forcing EOS")
     ap.add_argument("--logprobs", default=None, type=str, help="Logprobs")
     ap.add_argument("--batch_size", default=1, type=int, help="Batch size")
+    ap.add_argument("--force", default=False, type=bool, help="Overwrite output file if it already exists. Otherwise, skip inference.")
     
     return ap
 

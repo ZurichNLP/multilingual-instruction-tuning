@@ -30,12 +30,12 @@ def get_args():
     parser.add_argument('--seed', default=42, type=int, help='Random seed')
     return parser.parse_args()
 
-def pretty_print_instance(example: Dict, ignore_keys: Optional[List] =None) -> None:
+def pretty_print_instance(example: Dict, idx, ignore_keys: Optional[List] =None) -> None:
     
     for key in example.keys():
         if ignore_keys and key in ignore_keys:
             continue
-        print(f"\n**** {key.upper()} ****\n")
+        print(f"\n**** {idx} {key.upper()} ****\n")
         print(f"{example[key]}")
 
     print("="*80)
@@ -44,10 +44,10 @@ def peek_outputs(data, shuffled=False, seed=42, ignore_keys=None):
     
     if shuffled:
         random.seed(seed)
-        data = data.sample(frac=1).reset_index(drop=True)
+        data = data.sample(frac=1, random_state=seed)
     
     for i, row in data.iterrows():
-        pretty_print_instance(row.to_dict(), ignore_keys=ignore_keys)
+        pretty_print_instance(row.to_dict(), i, ignore_keys=ignore_keys)
         cont = input('Press enter to continue, or q to quit: ')
         if cont == 'q':
             break

@@ -136,7 +136,9 @@ def main(args):
         output_file = get_ouptut_filepath(args, args.output_path, '.jsonl')
     
     # Create output directory if it does not exist
-    if Path(output_file).exists():
+    if Path(output_file).exists() and not args.force:
+        raise FileExistsError(f'Output file {output_file} already exists! Use --force to overwrite. Skipping inference run...')
+    elif Path(output_file).exists() and args.force:
         logger.warning(f'Output file {output_file} already exists and will be overwritten!')
         Path(output_file).unlink()
     else:
