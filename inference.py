@@ -2,31 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """
-# from root dir of repo
-CUDA_VISIBLE_DEVICES=7 python -m llm_dqa.inference.inference llm_dqa/resources/models/llama-2-7b-hf_16bit_guanaco_dpr_quad_1024_merged/ \
-    --input_file llm_dqa/resources/data/basic_questions.jsonl \
-    --batch_size 1 \
-    --output_path llm_dqa/resources/outputs/ \
-    --prompt_format llm_dqa/inference/prompts/de_llama \
-    --src_key question \
+
+Example call:
+CUDA_VISIBLE_DEVICES=7 python inference.py resources/models/falcon_7b_de_merged \
+    --input_file data/alpaca_eval_instructions_de.json \
+    --batch_size 8 \
+    --output_path data/outputs \
+    --prompt_format guanaco_prompt \
+    --src_key instruction \
     --stop '### Human:' '\n### Human:'
-
-CUDA_VISIBLE_DEVICES=4,5,6,7 python -m llm_dqa.inference.inference llm_dqa/resources/models/llama-2-70b-hf_16bit_guanaco_dpr_quad_1024_merged/ \
-    --input_file llm_dqa/resources/data/fest1/OAFF23_faq-e5.jsonl \
-    --batch_size 1 \
-    --output_path llm_dqa/resources/outputs/ \
-    --prompt_format llm_dqa/inference/prompts/de_llama \
-    --src_key question --tgt_key answer --ctx_key contexts \
-    --stop '### Human:' '\n### Human:' --n_gpus 4
-
-# no contexts
-CUDA_VISIBLE_DEVICES=4,5,6,7 python -m llm_dqa.inference.inference llm_dqa/resources/models/llama-2-70b-hf_16bit_guanaco_dpr_quad_1024_merged/ \
-    --input_file llm_dqa/resources/data/fest1/OAFF23_faq.jsonl \
-    --batch_size 1 \
-    --output_path llm_dqa/resources/outputs/ \
-    --prompt_format llm_dqa/inference/prompts/de_llama \
-    --src_key question --tgt_key answer \
-    --stop '### Human:' '\n### Human:' --n_gpus 4
 
     
 """

@@ -235,11 +235,6 @@ class ScriptArguments:
         metadata={"help": "4 or 8bit precision base model loading."},
     )
 
-    trust_remote_code: Optional[bool] = field(
-        default=False,
-        metadata={"help": "Trust remote code for Falcon and MPT models."},
-    )
-
     pack_sequences: Optional[bool] = field(
         default=False,
         metadata={"help": "Whether to pack sequences into a ConstantLengthDataset or not."},

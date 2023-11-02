@@ -18,4 +18,3 @@ Download model used for language detection to `resources/lid/`
 wget https://data.statmt.org/lid/lid201-model.bin.gz -P resources/lid/
 gzip -d resources/lid/lid201-model.bin.gz 
 ```
-

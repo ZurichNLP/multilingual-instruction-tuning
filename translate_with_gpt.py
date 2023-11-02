@@ -93,8 +93,6 @@ Example call:
         --dataset_type "guanaco" \
         --model_name "gpt-3.5-turbo"
     
-    
-
     python translate_with_gpt.py \
         --input_file data/lima_train_en.json \
         --output_file data/lima_train_de.json \
