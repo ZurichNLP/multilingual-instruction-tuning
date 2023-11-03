@@ -19,7 +19,17 @@ n = 200
 mono_en = pd.read_json('data/guanaco_train_mono.json', lines=True)
 mono_en.info()
 
-tgt_langs = ['en', 'ca', 'de', 'es', 'fr', 'ru', 'zh']
+# tgt_langs = ['en', 'ca', 'de', 'es', 'fr', 'ru', 'zh']
+tgt_langs = [
+    'en', # 3627
+    'es', # 3850
+    'ru', # 754
+    'de', # 351
+    'zh', # 330
+    'fr', # 259
+    'ca', # 250
+]
+
 
 mono_ids = set(mono_en['id'].tolist())
 diff_ids = None
@@ -57,6 +67,58 @@ for lang in tgt_langs:
 # merge all dataframes horizontally
 df = pd.concat(dfs, axis=1)
 df.info()
+
+
+# 2. create "multilingual" datasets with 1, 2, 3, 4+ langs
+total_n = len(mono_en)
+non_eng_langs = [lang for lang in tgt_langs if lang != 'en']
+
+# shuffle data
+df = df.sample(frac=1, random_state=seed).reset_index(drop=True)
+
+df['text'] = None
+lang_i = 0
+for i, row in df.iterrows():
+    
+    if i > 0 and i % 200 == 0:
+        lang_i += 1
+    
+    df.at[i, 'text'] = row[non_eng_langs[lang_i]]
+    df.at[i, 'lang'] = non_eng_langs[lang_i]
+
+
+ids = None
+for c, lang in enumerate(non_eng_langs):
+
+    sub_dataset = mono_en[mono_en['id'].isin(common_ids)]
+    # subsample eng_Latn only to match all langs for monolingual training
+    non_en_data_to_add = df[df['lang'].isin(non_eng_langs[:c])][['text', 'lang', 'id']]
+
+    en_data_to_add = df[~df['id'].isin(non_en_data_to_add['id'].tolist())][['en', 'id']].rename(columns={'en': 'text'})
+    en_data_to_add['lang'] = 'en'
+
+    print(f'adding {len(en_data_to_add)} rows of en data')
+    # added_data = pd.concat([df[lang].sample(n=200, random_state=seed) for i, lang in enumerate(non_eng_langs[:c])]).reset_index(drop=True)
+    print(f'adding {len(non_en_data_to_add)} rows of non-en data')
+    
+    # concatenate mono_dataset and added_data
+    sub_dataset = pd.concat([sub_dataset, en_data_to_add, non_en_data_to_add]).reset_index(drop=True)
+
+    # ensure ids are unique
+    assert len(sub_dataset['id'].unique()) == len(sub_dataset)
+    
+    # ensure ids are the same for each dataset version
+    if not ids:
+        ids = set(sub_dataset['id'].tolist())
+    else:
+        assert ids == set(sub_dataset['id'].tolist())
+
+    print(sub_dataset['lang'].value_counts())
+
+    outfile = f'data/guanaco_train_mt_ml{c+1}.json'
+    sub_dataset.to_json(outfile, orient='records', lines=True, force_ascii=False)
+    print(f'Wrote {len(sub_dataset)} samples to {outfile}')
+
 
 en_sdf = mono_en[mono_en['id'].isin(common_ids)]
 en_sdf.info()
