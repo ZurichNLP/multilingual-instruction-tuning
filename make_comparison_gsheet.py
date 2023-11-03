@@ -95,32 +95,6 @@ if __name__ == "__main__":
         
         chunk_size = 50
         
-        # # Insert the header values
-        # header_values = df.columns.tolist()
-        # ws.insert_row(header_values, index=1)
-
-        # cell_list = ws.range('A1:' + gspread.utils.rowcol_to_a1(len(df) + 1, len(df.columns)))
-
-        # # Iterate over the DataFrame and update cells in chunks
-        # current_row = 1
-        # for start in range(0, len(df), chunk_size):
-        #     end = start + chunk_size
-        #     chunk = df.iloc[start:end]
-        #     chunk_values = chunk.values.flatten()
-
-        #     # Prepare the range update
-        #     chunk_cell_list = cell_list[start * len(df.columns):(start + len(chunk)) * len(df.columns)]
-        #     for cell, value in zip(chunk_cell_list, chunk_values):
-        #         cell.value = value
-
-        #     # Update in batch
-        #     try:
-        #         ws.update_cells(chunk_cell_list)
-        #         print(f'Uploaded rows {current_row} to {current_row + len(chunk) - 1}')
-        #         current_row += len(chunk)
-        #     except Exception as e:
-        #         print(f'An error occurred: {e}')
-
         # Resize the worksheet to accommodate the dataframe and header
         worksheet.resize(rows=len(df) + 1, cols=len(df.columns))
         
