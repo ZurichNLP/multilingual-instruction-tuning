@@ -55,6 +55,7 @@ def compute_perplexity(
     model_id: str = 'distilgpt2', 
     batch_size: int = 8, 
     max_length: int = 1024,
+    lang: str = 'en',
     **kwargs
     ):
     """
@@ -62,17 +63,10 @@ def compute_perplexity(
 
     input_texts = ["hello there", "general kenobi"]
     """
-
-    model_id = 'ai-forever/mGPT'
-    # lang = kwargs.get('lang', 'en')
-    # if lang == 'en':
-    #     model_id = 'distilgpt2'
-    # elif lang == 'de':
-    #     model_id = 'benjamin/gpt2-wechsel-german'
-    # elif lang == 'ru':
-    #     model_id = 'ai-forever/rugpt3small_based_on_gpt2'
-    # else:
-    #     raise ValueError(f"Language {lang} not supported.")
+    if lang != 'en':
+        model_id = 'ai-forever/mGPT'
+    else:
+        model_id = 'distilgpt2'
     
     # filter out empty strings
     predictions_ = [p for p in predictions if p.strip() != '']
@@ -101,7 +95,7 @@ def compute_perplexity(
                 logger.warning("Failed to compute PPL!")
                 return None
     
-    return ppl_scores['mean_perplexity']      
+    return ppl_scores['mean_perplexity'], model_id     
 
 def calculate_agreement(src_langs, tgt_langs):
     """calculates the proportion of positions at which the two lists have equal values, i.e. agreement"""
@@ -173,9 +167,9 @@ def main(args):
     metrics['tgt_lang'] = calculate_agreement([lid_model.get_long_tag(args.lang)]*len(sys_langs), sys_langs)
 
     if args.use_cuda:
-        metrics['ppl'] = compute_perplexity(sys_sents, lang=args.lang)
+        metrics['ppl'], metrics['ppl_model'] = compute_perplexity(sys_sents, lang=args.lang)
     else:
-        metrics['ppl'] = None
+        metrics['ppl'], metrics['ppl_model'] = None
     
     # add filename
     metrics['n'] = len(sys_sents)

@@ -27,7 +27,6 @@ from sheets import *
 def set_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("files", nargs='+', help="paths to input jsonl files")
-
     ap.add_argument("--outfile", required=False, default=None, help="path to output file")
     ap.add_argument("-c", "--columns", required=False, nargs="+", default=None, help="name of columns to extract")
     ap.add_argument("-s", "--sheet_name", required=False, default=None, help="name of sheet to create")
