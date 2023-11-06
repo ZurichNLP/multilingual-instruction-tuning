@@ -170,6 +170,5 @@ api_secrets.py
 logs/
 plots/
 v1_datasets/
-outputs/
 private/
 lm_cache/
