@@ -1,0 +1,2 @@
+lang_match,tgt_lang,ppl,ppl_model,n,file
+0.868,0.0,94.833,ai-forever/mGPT,805,data/outputs/llama_2_70b_hf_mt_ml5_merged/alpaca_eval_instructions_bg-none-guanaco_prompt-s42-k50-p0.9-t0.8-b128.jsonl
