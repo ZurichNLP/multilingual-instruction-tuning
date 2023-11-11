@@ -56,7 +56,7 @@ class ProgressLog:
         self.cost += cost
 
     def __repr__(self):
-        return f"Completed runs {self.done}/{self.total}, total prompt tokens: {self.prompt_tokens}, total completion tokens: {self.completion_tokens}, total cost: {self.cost:.8f}"
+        return f"{(self.done/self.total)*100}%, completed runs {self.done}/{self.total}, total prompt tokens: {self.prompt_tokens}, total completion tokens: {self.completion_tokens}, total cost: {self.cost:.8f}"
 
 @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(max_retries), before_sleep=logger.info, retry_error_callback=lambda _: None)
 async def get_completion(model_name, messages, session, semaphore, progress_log, seed, temperature, expects_json):
@@ -87,7 +87,12 @@ async def get_completion(model_name, messages, session, semaphore, progress_log,
                 "model_name": model_name,
             }
 
-            logger.info(progress_log)
+            # log progress every 10% of the way
+            if progress_log.total >= 10:
+                if progress_log.done > 0 and progress_log.done % (progress_log.total // 10) == 0:
+                    logger.info(progress_log)
+            else:
+                logger.info(progress_log)
             
             return response_dict
 
@@ -109,6 +114,7 @@ async def _run_api_request_parallel_process(model_name, content_list, max_parall
     
 # main function to be called from outside
 def run_api_request_parallel_process(model_name, content_list, max_parallel_calls=5, timeout=60, seed=42, temperature=0.7, expects_json=False):
+    logger.info(f"Running {len(content_list)} parallel requests with max_parallel_calls: {max_parallel_calls}, timeout: {timeout}, seed: {seed}, temperature: {temperature}, expects_json: {expects_json}")
     return asyncio.run(_run_api_request_parallel_process(model_name, content_list, max_parallel_calls=max_parallel_calls, timeout=timeout, seed=seed, temperature=temperature, expects_json=expects_json))
 
 if __name__ == "__main__":

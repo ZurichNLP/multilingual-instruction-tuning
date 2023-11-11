@@ -3,6 +3,21 @@
 
 """
 
+This script is used to evaluate a set of responses using LLM as a judge for a 6-point Likert scale assessment.
+
+Example usage:
+
+    python llm_judge_v2.py \
+        --input_file data/outputs/llama_2_7b_hf_de_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8-with_en.jsonl \
+        --eval_model_name "gpt-3.5-turbo-1106" \
+        --src_key "source" --tgt_key "system" \
+        --force
+
+    python llm_judge_v2.py \
+        --input_file data/outputs/llama_2_7b_hf_de_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8-with_en.jsonl \
+        --eval_model_name "gpt-3.5-turbo-1106" \
+        --src_key "source" --tgt_key "system" \
+        --force
 
 
 """
@@ -63,11 +78,11 @@ def set_args():
     ap.add_argument("--src_key", required=False, type=str, default="source", help="Source key")
     ap.add_argument("--tgt_key", required=False, type=str, default="system", help="Target key")
     ap.add_argument("--force", action="store_true", default=False, help="Overwrites existing outputs if found, otherwise skip.")
-    ap.add_argument("--seed", required=False, type=int, default=42, help="Random seed for sampling items and generation with API")
-
+    ap.add_argument("--data_seed", required=False, type=int, default=42, help="Random seed for sampling items from data")
+    ap.add_argument("--api_seed", required=False, type=int, default=42, help="Random seed for generation with API")
     ap.add_argument("--temperature", required=False, type=float, default=0.0, help="Temperature for generation with API")
     # ap.add_argument("--max_tokens", required=False, type=int, default=1000, help="Max tokens to use")
-    ap.add_argument("--timeout", required=False, type=int, default=60, help="Timeout for API calls")
+    ap.add_argument("--timeout", required=False, type=int, default=90, help="Timeout for API calls")
     ap.add_argument("--max_retries", required=False, type=int, default=10, help="Max retries for API calls for each item")
     ap.add_argument("--max_parallel_calls", required=False, type=int, default=10, help="Max parallel calls to API")
     return ap.parse_args()    
@@ -84,7 +99,7 @@ def parse_string_to_json(string):
         json_object = json.loads(string)
     except ValueError as e:
         logger.error(f"Error parsing string to JSON: {e}")
-        json_object = None
+        json_object = {}
 
     return json_object
 
@@ -96,13 +111,13 @@ if __name__ == "__main__":
 
     # add id column if not present    
     if 'id' not in data.columns:
-        data['id'] = data.index+1
+        data['id'] = data.index
     
     # limit number of items to evaluate
     if args.limit > 0:
-        data = data.sample(args.limit, random_state=args.seed).reset_index(drop=True)
+        data = data.sample(args.limit, random_state=args.data_seed).reset_index(drop=True)
 
-    logger.info(f"Evaluating {len(data)} items from {args.input_file} with seed {args.seed}")
+    logger.info(f"Evaluating {len(data)} items from {args.input_file}")
 
     # convert dataframe to dict
     data = data.to_dict(orient='records')
@@ -114,7 +129,7 @@ if __name__ == "__main__":
     elif args.output_dir_base:
         # e.g. data/llm_evals/likert/gpt-3.5-turbo-1106/llama_2_7b_hf_de_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8-translated.jsonl
         output_dir = Path(args.output_dir_base) / f"{args.eval_type}" / args.eval_model_name / Path(args.input_file).parent.name
-        output_file = Path(output_dir) / f"{Path(args.input_file).stem}-l{len(data)}-{args.src_key}-{args.tgt_key}.jsonl"
+        output_file = Path(output_dir) / f"{Path(args.input_file).stem}-l{len(data)}-ds{args.data_seed}-as{args.api_seed}-{args.src_key}-{args.tgt_key}.jsonl"
     
     else:
         raise NotImplementedError("Please specify either --output_file or --output_dir_base.")
@@ -122,8 +137,8 @@ if __name__ == "__main__":
     logger.info(f"Output file: {output_file}")
 
     if Path(output_file).exists() and not args.force:
-        logger.warning(f"Output file already exists. Use --force to overwrite.")
-        sys.exit(1)
+        logger.error(f"Output file already exists. Use --force to overwrite.")
+        sys.exit(0)
 
     if args.eval_type != "likert":
         raise NotImplementedError
@@ -134,7 +149,7 @@ if __name__ == "__main__":
     #     query_prompts = [prepare_prompts(strip_quotes(item[args.src_key]), strip_quotes(item[args.tgt_key]), human_template=human_template_likert) for item in data]
 
     total_cost = 0
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    Path(output_file).parent.mkdir(parents=True, exist_ok=True)
 
     # prepare prompts
     prompts = [prepare_prompt(item[args.src_key], item[args.tgt_key]) for item in data]
@@ -145,7 +160,7 @@ if __name__ == "__main__":
         prompts, 
         max_parallel_calls=args.max_parallel_calls, 
         timeout=args.timeout, 
-        seed=args.seed, 
+        seed=args.api_seed, 
         temperature=args.temperature, 
         expects_json=True
         )
@@ -157,15 +172,21 @@ if __name__ == "__main__":
     with open(output_file, "w", encoding="utf8") as outf:
         for item, result in zip(data, results):
 
-            eval_result = parse_string_to_json(result['content'])
+            # parse result content to JSON and remove from result dict
+            eval_result = parse_string_to_json(result.pop('content'))
+
             if eval_result:
-                # remove the 'content' key and add the eval result
-                result.pop('content')
-                result.update(eval_result)
+                # prefix keys with 'eval_'
+                eval_result = {f"eval_{k}": v for k, v in eval_result.items()}
             else:
                 logger.warning(f"Error parsing result content to JSON: {result['content']}")
 
-            item.update(result)
+            # update item with eval_result    
+            item.update(eval_result)
+                        
+            # add remaining key to eval_meta
+            item['eval_meta'] = result
+
             outf.write(f"{json.dumps(item, ensure_ascii=False)}\n")
             c += 1
 
