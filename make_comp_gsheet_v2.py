@@ -28,6 +28,22 @@ Example usage:
         data/to_annotate/llama_2_7b_hf_zh_merged-alpaca_eval_instructions_en-anno_instances.jsonl \
         --fields "source" "system_0" "system_42" "system_723" -n 20
 
+    # norwegian
+    python make_comp_gsheet_v2.py \
+        -i data/to_annotate/llama_2_7b_hf_de_merged-alpaca_eval_instructions_no-anno_instances.jsonl \
+        data/to_annotate/llama_2_7b_hf_fr_merged-alpaca_eval_instructions_no-anno_instances.jsonl \
+        data/to_annotate/llama_2_7b_hf_zh_merged-alpaca_eval_instructions_no-anno_instances.jsonl \
+        --fields "source" "system_0" "system_42" "system_723" -n 20
+
+    python make_comp_gsheet_v2.py \
+        -i data/to_annotate/llama_2_7b_hf_de_merged-alpaca_eval_instructions_is-anno_instances.jsonl \
+        data/to_annotate/llama_2_7b_hf_fr_merged-alpaca_eval_instructions_is-anno_instances.jsonl \
+        data/to_annotate/llama_2_7b_hf_ru_merged-alpaca_eval_instructions_is-anno_instances.jsonl \
+        data/to_annotate/llama_2_7b_hf_zh_merged-alpaca_eval_instructions_is-anno_instances.jsonl \
+        data/to_annotate/llama_2_7b_hf_es_merged-alpaca_eval_instructions_is-anno_instances.jsonl \
+        data/to_annotate/llama_2_7b_hf_ca_merged-alpaca_eval_instructions_is-anno_instances.jsonl \
+        --fields "source" "system_0" "system_42" "system_723" -n 20
+
 """
 
 import argparse
