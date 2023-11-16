@@ -18,3 +18,10 @@ Download model used for language detection to `resources/lid/`
 wget https://data.statmt.org/lid/lid201-model.bin.gz -P resources/lid/
 gzip -d resources/lid/lid201-model.bin.gz 
 ```
+
+install lm-eval harness
+```
+git clone git@github.com:EleutherAI/lm-evaluation-harness.git
+git reset --hard 3ccea2b2
+pip install -e ".[multilingual]"
+```
