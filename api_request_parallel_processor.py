@@ -58,7 +58,7 @@ class ProgressLog:
     def __repr__(self):
         return f"{(self.done/self.total)*100}%, completed runs {self.done}/{self.total}, total prompt tokens: {self.prompt_tokens}, total completion tokens: {self.completion_tokens}, total cost: {self.cost:.8f}"
 
-@retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(max_retries), before_sleep=logger.info, retry_error_callback=lambda _: None)
+@retry(wait=wait_random_exponential(multiplier=2, min=1, max=60), stop=stop_after_attempt(max_retries), before_sleep=logger.info, retry_error_callback=lambda _: None)
 async def get_completion(model_name, messages, session, semaphore, progress_log, seed, temperature, expects_json):
     async with semaphore:
 

@@ -1,0 +1,8 @@
+### Human: Translate the following sentence from English to Catalan.
+English:
+
+{{ instruction }}
+
+Catalan:
+
+### Assistant:

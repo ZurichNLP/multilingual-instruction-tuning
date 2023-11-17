@@ -1,0 +1,8 @@
+### Human: Translate the following sentence from English to Swedish.
+English:
+
+{{ instruction }}
+
+Swedish:
+
+### Assistant:

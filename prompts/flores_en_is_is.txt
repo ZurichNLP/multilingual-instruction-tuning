@@ -1,0 +1,8 @@
+### Human: Þýddu eftirfarandi setningu úr ensku yfir á íslensku.
+Enska:
+
+{{ instruction }}
+
+Íslenska:
+
+### Assistant:

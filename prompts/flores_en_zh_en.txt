@@ -1,0 +1,8 @@
+### Human: Translate the following sentence from English to Mandarin Chinese.
+English:
+
+{{ instruction }}
+
+Mandarin Chinese:
+
+### Assistant:

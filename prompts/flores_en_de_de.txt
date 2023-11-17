@@ -1,0 +1,8 @@
+### Human: Übersetze den folgenden Satz aus dem Englischen ins Deutsche.
+Englisch:
+
+{{ instruction }}
+
+Deutsch:
+
+### Assistant:

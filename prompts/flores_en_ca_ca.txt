@@ -1,0 +1,8 @@
+### Human: Tradueix la frase següent de l'anglès al català.
+Anglès:
+
+{{ instruction }}
+
+Català: 
+
+### Assistant:

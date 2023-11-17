@@ -88,7 +88,7 @@ for model in "${models[@]}"; do
                 --batch_size 8 \
                 --seed "${seed}" \
                 --output_path data/outputs \
-                --prompt_format guanaco_prompt \
+                --prompt_format prompts/guanaco_prompt \
                 --src_key instruction \
                 --stop "### Human:" "### Assistant:" "### Human" "### Assistant" \
                 --n_gpus "${n_gpus}"

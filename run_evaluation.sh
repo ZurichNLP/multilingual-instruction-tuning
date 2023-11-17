@@ -27,7 +27,7 @@ for model_outputs_dir in "${model_outputs_dirs[@]}"; do
             CUDA_VISIBLE_DEVICES="${gpu}" python evaluation.py \
                 "${model_outputs_file}" \
                 --lang "${lang}" \
-                --output_file "${output_file}" --use_cuda
+                --output_file "${output_file}" #--use_cuda
         fi
 
     done

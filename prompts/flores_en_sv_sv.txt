@@ -1,0 +1,8 @@
+### Human: Oversett følgende setning fra engelsk til svensk.
+Engelsk:
+
+{{ instruction }}
+
+Svenska:
+
+### Assistant:

@@ -1,0 +1,8 @@
+### Human: Translate the following sentence from English to Icelandic.
+English:
+
+{{ instruction }}
+
+Icelandic:
+
+### Assistant:

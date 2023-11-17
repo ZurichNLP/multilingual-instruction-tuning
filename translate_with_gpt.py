@@ -116,6 +116,14 @@ Example call:
         --src_key "system" \
         --dataset_type "alpaca_eval" \
         --model_name "gpt-3.5-turbo-1106" --original_prompts data/alpaca_eval_instructions_en.json
+
+    python translate_with_gpt.py \
+        --input_file data/translate_chellange_set.json \
+        --output_file data/translate_chellange_set_gpt-1106.json \
+        --tgt_lang "English" \
+        --src_key "text" \
+        --dataset_type "guanaco_human_template" \
+        --model_name "gpt-3.5-turbo-1106"
 """
 
 import sys
@@ -328,7 +336,7 @@ if __name__ == "__main__":
     with open(output_file, "w", encoding='utf8') as f:
         for line, translation in zip(data, run_llm(prompts=prompts, model_name=args.model_name, max_tokens=args.max_tokens)):
             if args.dataset_type == "alpaca_eval_outputs":
-                line[f'{args.src_key}_{args.tgt_lang[:2].lower()}_{args.model_name}'] = translation
+                line[f'{args.src_key}_en'] = translation
             else:
                 line = {args.src_key: translation}
             f.write(f"{json.dumps(line, ensure_ascii=False)}\n")

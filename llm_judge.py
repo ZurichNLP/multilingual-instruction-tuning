@@ -135,7 +135,7 @@ if __name__ == "__main__":
         raise NotImplementedError("Please specify either --output_file or --output_dir_base.")
     
     logger.info(f"Output file: {output_file}")
-
+    
     if Path(output_file).exists() and not args.force:
         logger.error(f"Output file already exists. Use --force to overwrite.")
         sys.exit(0)
@@ -179,7 +179,7 @@ if __name__ == "__main__":
                 # prefix keys with 'eval_'
                 eval_result = {f"eval_{k}": v for k, v in eval_result.items()}
             else:
-                logger.warning(f"Error parsing result content to JSON: {result['content']}")
+                logger.warning(f"Error parsing result content to JSON: {result} - Skipping {item['id']}")
 
             # update item with eval_result    
             item.update(eval_result)

@@ -8,7 +8,7 @@ CUDA_VISIBLE_DEVICES=7 python inference.py resources/models/falcon_7b_de_merged 
     --input_file data/alpaca_eval_instructions_de.json \
     --batch_size 8 \
     --output_path data/outputs \
-    --prompt_format guanaco_prompt \
+    --prompt_format prompts/guanaco_prompt \
     --src_key instruction \
     --stop '### Human:' '\n### Human:'
 
@@ -104,7 +104,10 @@ def prepare_inputs_for_generation(
         else:
             input_texts_.append(i) # do nothing
 
-    prompted_input_texts = [prompt_template.render(instruction=input_texts[i]) for i in range(len(input_texts_))]
+    if prompt_template is not None:
+        prompted_input_texts = [prompt_template.render(instruction=input_texts[i]) for i in range(len(input_texts_))]
+    else:
+        prompted_input_texts = input_texts_
 
     prompted_input_texts = [truncate_text(i, tokenizer, max_input_length, truncate_from_start) for i in prompted_input_texts]
 
@@ -121,7 +124,8 @@ def main(args):
     
     # Create output directory if it does not exist
     if Path(output_file).exists() and not args.force:
-        raise FileExistsError(f'Output file {output_file} already exists! Use --force to overwrite. Skipping inference run...')
+        logger.error(f"Output file already exists. Use --force to overwrite.")
+        sys.exit(0)
     elif Path(output_file).exists() and args.force:
         logger.warning(f'Output file {output_file} already exists and will be overwritten!')
         Path(output_file).unlink()
@@ -133,9 +137,12 @@ def main(args):
         json.dump(vars(args), f, indent=4)
         logger.info(f'Arguments written to {Path(output_file).with_suffix(".json")}')
     
-    prompts_dir = Path(args.prompt_format).parent.absolute()
-    prompt_name = Path(args.prompt_format).stem
-    prompt_template = Environment(loader=FileSystemLoader(prompts_dir)).get_template(f"{prompt_name}.txt")
+    if args.prompt_format:
+        prompts_dir = Path(args.prompt_format).parent.absolute()
+        prompt_name = Path(args.prompt_format).stem
+        prompt_template = Environment(loader=FileSystemLoader(prompts_dir)).get_template(f"{prompt_name}.txt")
+    else:
+        prompt_template = None
 
     # # see https://github.com/vllm-project/vllm/blob/main/vllm/sampling_params.py
     sampling_params = SamplingParams(

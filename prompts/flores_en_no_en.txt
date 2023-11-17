@@ -1,0 +1,8 @@
+### Human: Translate the following sentence from English to Norwegian Bokmål.
+English:
+
+{{ instruction }}
+
+Norwegian Bokmål:
+
+### Assistant:

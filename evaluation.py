@@ -169,7 +169,7 @@ def main(args):
     if args.use_cuda:
         metrics['ppl'], metrics['ppl_model'] = compute_perplexity(sys_sents, lang=args.lang)
     else:
-        metrics['ppl'], metrics['ppl_model'] = None
+        metrics['ppl'], metrics['ppl_model'] = None, None
     
     # add filename
     metrics['n'] = len(sys_sents)
