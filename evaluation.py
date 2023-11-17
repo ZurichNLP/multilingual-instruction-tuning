@@ -13,6 +13,7 @@ Example call:
 
 """
 
+import sys
 from typing import List, Dict
 import json
 import time
@@ -23,23 +24,23 @@ import numpy as np
 import evaluate
 
 import torch
+from sacremoses import MosesPunctNormalizer, MosesTokenizer
 
-# from llm_dqa.utils.helpers import str2bool, postprocess_text, logger
-# from llm_dqa.api_secrets import OPENAI_API_KEY
-# set OpenAI API key as environment variable (required for ragas)
-# os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
-
-from helpers import str2bool, logger
+from helpers import logger
 from open_lid import LIDModel
 
+mpn = MosesPunctNormalizer()
+bleu = evaluate.load('sacrebleu')
+chrf = evaluate.load('chrf')
+# comet = evaluate.load('comet')
 perplexity = evaluate.load('perplexity', module_type='metric')
 
 def set_args():
     ap = argparse.ArgumentParser()
     ap.add_argument('input_file', type=str, help="File to evaluate. Expects a jsonl file with 'source', 'reference' and 'system' keys")
     ap.add_argument('-o', '--output_file', type=str, default=None, help='')    
-    ap.add_argument('-v', '--verbose', type=str2bool, nargs='?', const=True, default=False, help='if provided, print verbose output.')
-    ap.add_argument('--use_cuda', type=str2bool, nargs='?', const=True, default=False, help='if provided, compute GPU-based metrics.')
+    ap.add_argument('-v', '--verbose', action='store_true', help='if provided, print verbose output.')
+    ap.add_argument('--use_cuda', action='store_true', help='if provided, compute GPU-based metrics.')
     ap.add_argument('--lang', type=str, default='en', help='target language. Required for bertscore and tokenization')
     ap.add_argument('--src_key', type=str, default='source', help='key for source texts in jsonl file')
     ap.add_argument('--ref_key', type=str, default='reference', help='key for reference texts in jsonl file')
@@ -47,8 +48,66 @@ def set_args():
     ap.add_argument('--fasttext_model_path', type=str, default=None, help='path to fasttext language detection model')
     ap.add_argument('--stop_tokens', type=str, nargs='*', default=None, help='tokens to remove from system texts before computing metrics')
     ap.add_argument('--non_answer_str', type=str, default=None, help='string to use as no answer found')
+    ap.add_argument('--force', action='store_true', help='if provided, overwrite existing output files.')
     return ap.parse_args()
 
+def tokenize_texts(texts: List[str], lang: str = 'en') -> List[str]:
+    """
+    Tokenize texts for metrics in Hugging Face evaluation package.
+
+    :texts: are expected to be either a list of lists of strings (where each list of strings is a reference)
+    or a list of strings (where each string is a sys output).
+    """
+    mt = MosesTokenizer(lang=lang)
+    return [mt.tokenize(mpn.normalize(text), return_str=True) for text in texts]
+
+def compute_bleu(
+    predictions: List[str], 
+    references: List[List[str]], 
+    lang: str = 'en',
+    ) -> Dict:
+    """
+    https://huggingface.co/spaces/evaluate-metric/sacrebleu
+    
+    predictions = ["hello there", "general kenobi"]
+    references = [
+        ["hello there general kenobi", "hello there !"],
+        ["foo bar foobar"]
+    ]   
+    """ 
+    
+    # if kwargs.get('verbose'):
+    logger.info(f'Computing BLEU with {len(predictions)} predictions and {len(references)} references...')
+    
+    # sacrebleu applies tokenization to the predictions and references separately, 
+    # but can override this behavior by passing setting force=True
+    if lang == 'zh':
+        tokenize = 'zh'
+    else:
+        tokenize = '13a'
+
+    return bleu.compute(predictions=predictions, references=references, tokenize=tokenize)
+
+def compute_chrf(
+    predictions: List[str],
+    references: List[List[str]],
+    lang: str = 'en',
+    ) -> Dict:
+    """
+    """
+
+    # if kwargs.get('verbose'):
+    logger.info(f'Computing chrF with {len(predictions)} predictions and {len(references)} references...')
+    
+    try:
+        predictions = tokenize_texts(predictions, lang=lang)
+        references = tokenize_texts(references, lang=lang)
+    except AssertionError:
+        logger.warning(f'Failed to tokenize texts. Computing chrF without tokenization.')
+    
+    return chrf.compute(predictions=predictions, references=references, 
+                        char_order=2, beta=2
+                        )
 
 def compute_perplexity(
     predictions: List[str], 
@@ -112,6 +171,10 @@ def calculate_agreement(src_langs, tgt_langs):
 
 def main(args):
 
+    if Path(args.output_file).exists() and not args.force:
+        logger.error(f"Output file {args.output_file} already exists. Use --force to overwrite.")
+        sys.exit(1)
+
     # start timer
     logger.info("Starting evaluation...")
     start_time = time.time()
@@ -141,7 +204,7 @@ def main(args):
  
     if args.ref_key is not None and args.ref_key in data.columns:
         refs_sents = data[args.ref_key].to_list()
-        # if we have multiple references per sample, we need to transpose the list of lists
+        # # if we have multiple references per sample, we need to transpose the list of lists
         if isinstance(refs_sents[0], list):
             refs_sents = list(map(list, [*zip(*refs_sents)])) # transpose from [# samples, # refs_per_sample] to [# refs_per_sample, # samples]
         else:
@@ -165,12 +228,18 @@ def main(args):
     metrics['lang_match'] = calculate_agreement(src_langs, sys_langs)
 
     metrics['tgt_lang'] = calculate_agreement([lid_model.get_long_tag(args.lang)]*len(sys_langs), sys_langs)
-
+    
     if args.use_cuda:
         metrics['ppl'], metrics['ppl_model'] = compute_perplexity(sys_sents, lang=args.lang)
     else:
         metrics['ppl'], metrics['ppl_model'] = None, None
-    
+
+    if refs_sents is not None:
+        # compute BLEU, chrF
+        # metrics.update(mt_metrics.compute(predictions=sys_sents, references=refs_sents, sources=src_sents))
+        metrics['bleu'] = compute_bleu(predictions=sys_sents, references=refs_sents, lang=args.lang)['score']
+        metrics['chrf'] = compute_chrf(sys_sents, refs_sents, lang=args.lang)['score']
+
     # add filename
     metrics['n'] = len(sys_sents)
     metrics['file'] = args.input_file

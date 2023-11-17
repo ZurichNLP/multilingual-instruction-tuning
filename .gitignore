@@ -172,3 +172,15 @@ plots/
 v1_datasets/
 private/
 lm_cache/
+data/gpt3_langs_by_word_count.csv
+data/refinedweb_langs.tsv
+data/to_annotate/
+data/translate_challenge_is_set_gpt-1106.json
+data/translate_challenge_set.json
+data/translate_challenge_set_de_google.json
+data/translate_challenge_set_de_gpt-1106.json
+data/translate_challenge_set_is_google.json
+inspect_langs.sh
+inspect_refinedweb.py
+inspect_refinedwed.ipynb
+translate_with_googletranslate.py
