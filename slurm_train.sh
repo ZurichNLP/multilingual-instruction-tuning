@@ -43,13 +43,23 @@ echo "log_file: ${log_file}"
 echo "*******************"
 
 
+# python sft_training.py \
+#     --model_name_or_path "${model_name_or_path}" \
+#     --train_dataset "${train_dataset}" \
+#     --eval_dataset "${eval_dataset}" \
+#     --output_dir "${output_dir}" \
+#     --num_train_epochs 10 \
+#     --per_device_train_batch_size 2 --per_device_eval_batch_size 2 --gradient_accumulation_steps 8 \
+#     --log_with "wandb" 2>&1 | tee "${log_file}"
+
 python sft_training.py \
     --model_name_or_path "${model_name_or_path}" \
     --train_dataset "${train_dataset}" \
     --eval_dataset "${eval_dataset}" \
     --output_dir "${output_dir}" \
-    --num_train_epochs 10 \
+    --max_steps 2000 \
     --per_device_train_batch_size 2 --per_device_eval_batch_size 2 --gradient_accumulation_steps 8 \
     --log_with "wandb" 2>&1 | tee "${log_file}"
+
 
 echo "Training started..."
