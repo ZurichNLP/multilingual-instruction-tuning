@@ -1,0 +1,2 @@
+lang_match,tgt_lang,ppl,ppl_model,bleu,chrf,n,file
+0.072,0.0,,,14.077,56.901,1012,data/flores_outputs/llama_2_7b_hf_ml2_merged/flores_devtest_en_bg-none-flores_en_bg_en-s0-k50-p0.9-t0.001-b128.jsonl

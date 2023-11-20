@@ -16,15 +16,21 @@ for model_outputs_dir in "${model_outputs_dirs[@]}"; do
         # expected filename: /../../flores_devtest_en_de-none-flores_en_de_en-s0-k50-p0.9-t0.001-b128.jsonl
         lang=$(basename "${model_outputs_file}" | awk -F'[_-]' '{print $4}')
 
-        # run lang assignment
-        echo "Running evaluation on ${model_outputs_file}"
-        echo "Inferred language: ${lang}"
-        echo "Output file: ${output_file}"        
-        CUDA_VISIBLE_DEVICES="${gpu}" python evaluation.py \
-            "${model_outputs_file}" \
-            --lang "${lang}" \
-            --output_file "${output_file}" \
-            --src_key source --tgt_key system --ref_key reference --force
+        # if output file exists, skip
+        if [[ -f "$output_file" ]]; then
+            echo "Output file exists: ${output_file}"
+            continue
+        else
+            # run lang assignment
+            echo "Running evaluation on ${model_outputs_file}"
+            echo "Inferred language: ${lang}"
+            echo "Output file: ${output_file}"        
+            CUDA_VISIBLE_DEVICES="${gpu}" python evaluation.py \
+                "${model_outputs_file}" \
+                --lang "${lang}" \
+                --output_file "${output_file}" \
+                --src_key source --tgt_key system --ref_key reference #--force
+        fi
 
     done
 done
