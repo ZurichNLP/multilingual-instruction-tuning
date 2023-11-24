@@ -184,3 +184,4 @@ inspect_langs.sh
 inspect_refinedweb.py
 inspect_refinedwed.ipynb
 translate_with_googletranslate.py
+data/xquad_outputs_v1/
