@@ -173,20 +173,19 @@ if __name__ == "__main__":
         for item, result in zip(data, results):
 
             # parse result content to JSON and remove from result dict
-            eval_result = parse_string_to_json(result.pop('content'))
-
-            if eval_result:
+            try:
+                eval_result = parse_string_to_json(result.pop('content'))
                 # prefix keys with 'eval_'
                 eval_result = {f"eval_{k}": v for k, v in eval_result.items()}
-            else:
+
+                # update item with eval_result    
+                item.update(eval_result)
+                # add remaining key to eval_meta
+                item['eval_meta'] = result
+
+            except:
                 logger.warning(f"Error parsing result content to JSON: {result} - Skipping {item['id']}")
-
-            # update item with eval_result    
-            item.update(eval_result)
-                        
-            # add remaining key to eval_meta
-            item['eval_meta'] = result
-
+            
             outf.write(f"{json.dumps(item, ensure_ascii=False)}\n")
             c += 1
 

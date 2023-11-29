@@ -1,2 +1,2 @@
 lang_match,tgt_lang,ppl,ppl_model,bleu,chrf,n,file
-0.018,0.973,,,23.647,32.841,1012,data/flores_outputs/falcon_7b_fr_merged/flores_devtest_en_zh-none-flores_en_zh_zh-s42-k50-p0.9-t0.001-b128.jsonl
+0.018,0.973,,,21.323,25.773,1012,data/flores_outputs/falcon_7b_fr_merged/flores_devtest_en_zh-none-flores_en_zh_zh-s42-k50-p0.9-t0.001-b128.jsonl

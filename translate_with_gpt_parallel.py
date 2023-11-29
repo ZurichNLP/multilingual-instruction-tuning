@@ -55,7 +55,7 @@ def set_args():
     ap.add_argument("--data_seed", type=int, default=42)
     ap.add_argument("--api_seed", type=int, default=42)
     ap.add_argument("--max_parallel_calls", type=int, default=5)
-    ap.add_argument("--timeout", type=int, default=60)
+    ap.add_argument("--timeout", type=int, default=120)
     ap.add_argument("--temperature", type=float, default=0.0)
     
     ap.add_argument("--force", action="store_true", help="Overwrite output file if it already exists")
@@ -80,7 +80,10 @@ if __name__ == "__main__":
     if Path(output_file).exists() and not args.force:
         logger.error(f"Output file already exists. Use --force to overwrite.")
         sys.exit(0)
-    
+    else:
+        Path(output_file).parent.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Writing to {output_file}")
+
     if args.original_prompts:
         # get the original prompts as well
         en_prompts = pd.read_json(args.original_prompts, lines=True).rename(columns={"instruction": "source_en"})

@@ -236,6 +236,8 @@ def main(args):
 
     if refs_sents is not None:
         # compute BLEU, chrF
+        # postprocess system outputs to take only the first sentence upto linebreak
+        sys_sents = [s.split('\n')[0] for s in sys_sents]
         # metrics.update(mt_metrics.compute(predictions=sys_sents, references=refs_sents, sources=src_sents))
         metrics['bleu'] = compute_bleu(predictions=sys_sents, references=refs_sents, lang=args.lang)['score']
         metrics['chrf'] = compute_chrf(sys_sents, refs_sents, lang=args.lang)['score']
