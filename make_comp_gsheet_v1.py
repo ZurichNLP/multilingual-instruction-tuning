@@ -56,7 +56,7 @@ def load_data(files):
     
     # remove columns with names ending with ["finish_reason", "secs", "prompt", "source_lang", "system_lang"]
     for col in df.columns:
-        if col.endswith(("finish_reason", "secs", "prompt", "source_lang", "system_lang")):
+        if col.endswith(("finish_reason", "secs", "prompt", "source_lang", "system_lang", "eval_meta")):
             df.drop(col, axis=1, inplace=True)
 
     # remove columns which are duplicated, keeping the first
