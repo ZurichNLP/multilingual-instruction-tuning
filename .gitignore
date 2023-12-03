@@ -168,7 +168,6 @@ resources
 scratch/
 api_secrets.py
 logs/
-plots/
 v1_datasets/
 private/
 lm_cache/
