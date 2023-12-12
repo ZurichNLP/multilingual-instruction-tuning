@@ -4,6 +4,7 @@
 """
 
 Gathers data from multiple annotation instances files and outputs a google sheet for inspection.
+Note, first run `prepare_evaluation_instances.py` to generate the annotation instances files.
 
 Generates 1 spreadsheet for each language (based on the input files specified). 
 
