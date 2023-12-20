@@ -111,4 +111,4 @@ bash scripts/run_llm_judge.sh \
 
 # Results
 
-Plots used in the paper can be generated using [this notebook](.analyses/process_main_results.ipynb).
+Plots used in the paper can be generated using [this notebook](./analyses/process_main_results.ipynb).
