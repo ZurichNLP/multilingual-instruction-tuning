@@ -1,2 +1,0 @@
-lang_match,tgt_lang,ppl,n,file
-0.935,0.959,103.478,805,data/outputs/falcon_7b_ru_merged/alpaca_eval_instructions_en-none-guanaco_prompt-s42-k50-p0.9-t0.8-b8.jsonl

@@ -1,2 +1,2 @@
 lang_match,tgt_lang,ppl,file
-0.943,0.948,29.251,data/outputs/llama_2_7b_hf_ml4_merged/alpaca_eval_instructions_fr-none-guanaco_prompt-s42-k50-p0.9-t0.8-b8.jsonl
+0.943,0.948,29.251,data/alpaca_eval_outputs/llama_2_7b_hf_ml4_merged/alpaca_eval_instructions_fr-none-guanaco_prompt-s42-k50-p0.9-t0.8-b8.jsonl

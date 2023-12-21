@@ -1,2 +1,0 @@
-lang_match,tgt_lang,ppl,ppl_model,n,file
-0.907,0.909,214.183,ai-forever/mGPT,805,data/outputs/falcon_7b_ca_merged/alpaca_eval_instructions_is-none-guanaco_prompt-s723-k50-p0.9-t0.8-b8.jsonl
