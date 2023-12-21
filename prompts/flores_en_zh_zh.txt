@@ -1,8 +1,0 @@
-### Human: 将以下句子从英语翻译成普通话。
-英语：
-
-{{ instruction }}
-
-普通话：
-
-### Assistant:

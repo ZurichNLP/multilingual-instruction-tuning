@@ -1,8 +1,0 @@
-### Human: Translate the following sentence from English to Russian.
-English:
-
-{{ instruction }}
-
-Russian:
-
-### Assistant:

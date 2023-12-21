@@ -1,8 +1,0 @@
-### Human: Traduzca la siguiente oración del inglés al español.
-English:
-
-{{ instruction }}
-
-Español:
-
-### Assistant:

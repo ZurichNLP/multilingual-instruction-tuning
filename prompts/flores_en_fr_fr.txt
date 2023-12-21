@@ -1,8 +1,0 @@
-### Human: Traduisez la phrase suivante de l\'anglais au français.
-Anglais:
-
-{{ instruction }}
-
-français:
-
-### Assistant:

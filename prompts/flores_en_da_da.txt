@@ -1,8 +1,0 @@
-### Human: Oversett følgende setning fra engelsk til dansk.
-Engelsk:
-
-{{ instruction }}
-
-Dansk:
-
-### Assistant:

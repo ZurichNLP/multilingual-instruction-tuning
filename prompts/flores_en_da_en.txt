@@ -1,8 +1,0 @@
-### Human: Translate the following sentence from English to Danish.
-English:
-
-{{ instruction }}
-
-Danish:
-
-### Assistant:

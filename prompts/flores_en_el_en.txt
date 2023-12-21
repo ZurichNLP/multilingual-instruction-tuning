@@ -1,8 +1,0 @@
-### Human: Translate the following sentence from English to standard Modern Greek.
-English:
-
-{{ instruction }}
-
-standard Modern Greek:
-
-### Assistant:

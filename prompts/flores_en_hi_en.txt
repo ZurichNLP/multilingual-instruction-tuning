@@ -1,8 +1,0 @@
-### Human: Translate the following sentence from English to Hindi.
-English:
-
-{{ instruction }}
-
-Hindi:
-
-### Assistant:
