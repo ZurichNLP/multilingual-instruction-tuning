@@ -90,9 +90,9 @@ for model in "${models[@]}"; do
                 --input_file "${test_set}" \
                 --batch_size 128 \
                 --seed "${seed}" \
-                --output_path data/outputs \
-                --prompt_format prompts/guanaco_prompt \
-                --src_key instruction \
+                --output_path "data/alpaca_eval_outputs" \
+                --prompt_format "prompts/guanaco_prompt" \
+                --src_key "instruction" \
                 --stop "### Human:" "### Assistant:" "### Human" "### Assistant" \
                 --n_gpus 4
         done

@@ -93,9 +93,9 @@ for model in "${models[@]}"; do
                 --input_file "${test_set}" \
                 --batch_size 128 \
                 --seed "${seed}" \
-                --output_path data/xquad_outputs \
+                --output_path "data/xquad_outputs" \
                 --prompt_format "prompts/blank" \
-                --src_key instruction --tgt_key answer \
+                --src_key "instruction" --tgt_key "answer" \
                 --stop "### Human:" "### Assistant:" "### Human" "### Assistant" \
                 --n_gpus "${n_gpus}" --temperature 0.001
 

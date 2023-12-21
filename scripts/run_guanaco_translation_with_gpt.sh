@@ -4,8 +4,8 @@
 
 # German
 python translate_with_gpt.py \
-    --input_file data/guanaco_train_mono_1k_en.json \
-    --output_file data/guanaco_train_mono_1k_de.json \
+    --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+    --output_file data/guanaco/guanaco_train_mono_1k_de.json \
     --tgt_lang "German" \
     --src_key "text" \
     --dataset_type "guanaco" \
@@ -13,8 +13,8 @@ python translate_with_gpt.py \
 
 # French
 python translate_with_gpt.py \
-    --input_file data/guanaco_train_mono_1k_en.json \
-    --output_file data/guanaco_train_mono_1k_fr.json \
+    --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+    --output_file data/guanaco/guanaco_train_mono_1k_fr.json \
     --tgt_lang "French" \
     --src_key "text" \
     --dataset_type "guanaco" \
@@ -22,8 +22,8 @@ python translate_with_gpt.py \
 
 # Chinese
 python translate_with_gpt.py \
-    --input_file data/guanaco_train_mono_1k_en.json \
-    --output_file data/guanaco_train_mono_1k_zh.json \
+    --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+    --output_file data/guanaco/guanaco_train_mono_1k_zh.json \
     --tgt_lang "Mandarin Chinese" \
     --src_key "text" \
     --dataset_type "guanaco" \
@@ -31,8 +31,8 @@ python translate_with_gpt.py \
 
 # Spanish
 python translate_with_gpt.py \
-    --input_file data/guanaco_train_mono_1k_en.json \
-    --output_file data/guanaco_train_mono_1k_es.json \
+    --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+    --output_file data/guanaco/guanaco_train_mono_1k_es.json \
     --tgt_lang "Spanish" \
     --src_key "text" \
     --dataset_type "guanaco" \
@@ -40,8 +40,8 @@ python translate_with_gpt.py \
 
 # Russian
 python translate_with_gpt.py \
-    --input_file data/guanaco_train_mono_1k_en.json \
-    --output_file data/guanaco_train_mono_1k_ru.json \
+    --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+    --output_file data/guanaco/guanaco_train_mono_1k_ru.json \
     --tgt_lang "Russian" \
     --src_key "text" \
     --dataset_type "guanaco" \
@@ -49,8 +49,8 @@ python translate_with_gpt.py \
 
 # Catalan
 python translate_with_gpt.py \
-    --input_file data/guanaco_train_mono_1k_en.json \
-    --output_file data/guanaco_train_mono_1k_ca.json \
+    --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+    --output_file data/guanaco/guanaco_train_mono_1k_ca.json \
     --tgt_lang "Catalan" \
     --src_key "text" \
     --dataset_type "guanaco" \
@@ -58,8 +58,8 @@ python translate_with_gpt.py \
 
 # # Swedish
 # python translate_with_gpt.py \
-#     --input_file data/guanaco_train_mono_1k_en.json \
-#     --output_file data/guanaco_train_mono_1k_sv.json \
+#     --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+#     --output_file data/guanaco/guanaco_train_mono_1k_sv.json \
 #     --tgt_lang "Swedish" \
 #     --src_key "text" \
 #     --dataset_type "guanaco" \
@@ -67,8 +67,8 @@ python translate_with_gpt.py \
 
 # # Norwegian Bokmål
 # python translate_with_gpt.py \
-#     --input_file data/guanaco_train_mono_1k_en.json \
-#     --output_file data/guanaco_train_mono_1k_no.json \
+#     --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+#     --output_file data/guanaco/guanaco_train_mono_1k_no.json \
 #     --tgt_lang "Norwegian Bokmål" \
 #     --src_key "text" \
 #     --dataset_type "guanaco" \
@@ -76,8 +76,8 @@ python translate_with_gpt.py \
 
 # # Danish
 # python translate_with_gpt.py \
-#     --input_file data/guanaco_train_mono_1k_en.json \
-#     --output_file data/guanaco_train_mono_1k_da.json \
+#     --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+#     --output_file data/guanaco/guanaco_train_mono_1k_da.json \
 #     --tgt_lang "Danish" \
 #     --src_key "text" \
 #     --dataset_type "guanaco" \
@@ -85,8 +85,8 @@ python translate_with_gpt.py \
     
 # # Bulgarian
 # python translate_with_gpt.py \
-#     --input_file data/guanaco_train_mono_1k_en.json \
-#     --output_file data/guanaco_train_mono_1k_bg.json \
+#     --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+#     --output_file data/guanaco/guanaco_train_mono_1k_bg.json \
 #     --tgt_lang "Bulgarian" \
 #     --src_key "text" \
 #     --dataset_type "guanaco" \
@@ -94,8 +94,8 @@ python translate_with_gpt.py \
 
 # # Icelandic
 # python translate_with_gpt.py \
-#     --input_file data/guanaco_train_mono_1k_en.json \
-#     --output_file data/guanaco_train_mono_1k_is.json \
+#     --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+#     --output_file data/guanaco/guanaco_train_mono_1k_is.json \
 #     --tgt_lang "Icelandic" \
 #     --src_key "text" \
 #     --dataset_type "guanaco" \
@@ -103,8 +103,8 @@ python translate_with_gpt.py \
 
 # # Hindi
 # python translate_with_gpt.py \
-#     --input_file data/guanaco_train_mono_1k_en.json \
-#     --output_file data/guanaco_train_mono_1k_hi.json \
+#     --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+#     --output_file data/guanaco/guanaco_train_mono_1k_hi.json \
 #     --tgt_lang "Hindi" \
 #     --src_key "text" \
 #     --dataset_type "guanaco" \
@@ -112,8 +112,8 @@ python translate_with_gpt.py \
 
 # # Greek
 # python translate_with_gpt.py \
-#     --input_file data/guanaco_train_mono_1k_en.json \
-#     --output_file data/guanaco_train_mono_1k_el.json \
+#     --input_file data/guanaco/guanaco_train_mono_1k_en.json \
+#     --output_file data/guanaco/guanaco_train_mono_1k_el.json \
 #     --tgt_lang "standard modern Greek" \
 #     --src_key "text" \
 #     --dataset_type "guanaco" \

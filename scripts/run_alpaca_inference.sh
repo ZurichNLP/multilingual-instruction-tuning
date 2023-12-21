@@ -3,10 +3,10 @@
 
 # This script runs inference for a given set of models and test sets.
 # Example call:
-# bash run_inference_v2.sh \
+# bash run_inference.sh \
 # -d 0 \
 # -m resources/models/llama_2_7b_hf_ml2_merged resources/models/llama_2_7b_hf_ml3_merged \
-# -t data/alpaca_eval_instructions_*.json
+# -t data/alpaca_eval/alpaca_eval_instructions_*.json
 
 # Variables to hold arguments for -m and -t
 declare -a models
@@ -87,9 +87,9 @@ for model in "${models[@]}"; do
                 --input_file "${test_set}" \
                 --batch_size 8 \
                 --seed "${seed}" \
-                --output_path data/outputs \
-                --prompt_format prompts/guanaco_prompt \
-                --src_key instruction \
+                --output_path "data/alpaca_eval_outputs" \
+                --prompt_format "prompts/guanaco_prompt" \
+                --src_key "instruction" \
                 --stop "### Human:" "### Assistant:" "### Human" "### Assistant" \
                 --n_gpus "${n_gpus}"
         done

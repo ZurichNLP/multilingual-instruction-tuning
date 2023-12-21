@@ -5,7 +5,7 @@
 # It takes as input the outputs of the LLM models and outputs the evaluation results.
 
 # Example usage:
-# bash run_llm_judge.sh -m llama_2_7b_hf_de_merged -l de fr
+# bash run_llm_judge.sh -m llama_2_7b_hf_ml2_merged -l de fr
 
 
 set -e
@@ -85,9 +85,9 @@ for model in "${models[@]}"; do
     
                 echo "*** Translating non-English responses to English... ***"
                 # step 1: translate non-English responses to English
-                python translate_with_gpt_parallel.py \
-                    --input_file "data/outputs/${model}/alpaca_eval_instructions_${lang}-none-guanaco_prompt-s${seed}-k50-p0.9-t0.8-b8.jsonl" \
-                    --output_file "data/translated_outputs/${model}/alpaca_eval_instructions_${lang}-none-guanaco_prompt-s${seed}-k50-p0.9-t0.8-b8.jsonl" \
+                python translate_with_gpt.py \
+                    --input_file "data/alpaca_eval_outputs/${model}/alpaca_eval_instructions_${lang}-none-guanaco_prompt-s${seed}-k50-p0.9-t0.8-b8.jsonl" \
+                    --output_file "data/alpaca_eval_outputs_translated/${model}/alpaca_eval_instructions_${lang}-none-guanaco_prompt-s${seed}-k50-p0.9-t0.8-b8.jsonl" \
                     --tgt_lang "English" \
                     --src_key "system" \
                     --limit 300 --data_seed 42 --api_seed 42 \
@@ -97,7 +97,7 @@ for model in "${models[@]}"; do
                 echo "*** Evaluating translated responses... ***"
                 # step 2: evaluate translated English responses
                 python llm_judge.py \
-                    --input_file "data/translated_outputs/${model}/alpaca_eval_instructions_${lang}-none-guanaco_prompt-s${seed}-k50-p0.9-t0.8-b8.jsonl" \
+                    --input_file "data/alpaca_eval_outputs_translated/${model}/alpaca_eval_instructions_${lang}-none-guanaco_prompt-s${seed}-k50-p0.9-t0.8-b8.jsonl" \
                     --eval_model_name "${evaluation_model}" \
                     --src_key "source_en" \
                     --tgt_key "system_en" \
@@ -108,7 +108,7 @@ for model in "${models[@]}"; do
             echo "*** Evaluating non-translated responses directly... ***"
             # step 1: evaluate the original English responses
             python llm_judge.py \
-                --input_file "data/outputs/${model}/alpaca_eval_instructions_${lang}-none-guanaco_prompt-s${seed}-k50-p0.9-t0.8-b"*".jsonl" \
+                --input_file "data/alpaca_eval_outputs/${model}/alpaca_eval_instructions_${lang}-none-guanaco_prompt-s${seed}-k50-p0.9-t0.8-b"*".jsonl" \
                 --eval_model_name "${evaluation_model}" \
                 --src_key "source" \
                 --tgt_key "system" \

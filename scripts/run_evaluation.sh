@@ -3,8 +3,7 @@
 
 # This script runs inference on the test set using the trained model.
 # Example usage:
-# bash run_evaluation.sh 0 data/outputs/llama_2_7b_hf_ml*
-# bash run_evaluation.sh 0 data/outputs/llama_2_7b_hf_zh_merged
+# bash run_evaluation.sh 0 data/alpaca_eval_outputs/llama_2_7b_hf_ml*
 
 gpu=$1 # comma separated list of gpu ids or just one gpu id
 model_outputs_dirs=("${@:2}")
