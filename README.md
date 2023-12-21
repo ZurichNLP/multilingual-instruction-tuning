@@ -1,4 +1,4 @@
-This repository contains the code and data for the paper "Turning English-centric LLMs into Polyglots: How Much Multilinguality is Needed?"
+This repository contains the code and data for the paper "Turning English-centric LLMs Into Polyglots: How Much Multilinguality Is Needed?"
 
 # Environment Setup
 
