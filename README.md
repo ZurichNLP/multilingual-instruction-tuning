@@ -14,6 +14,7 @@ pip install -r requirements.txt
 Download model used for language detection to `resources/lid/`
 
 ```
+mkdir resources
 wget https://data.statmt.org/lid/lid201-model.bin.gz -P resources/lid/
 gzip -d resources/lid/lid201-model.bin.gz 
 ```
@@ -36,7 +37,7 @@ echo "OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'" > api_secrets.py
 
 # Data and Data Preparation
 
-The data used for our experiments is available in [data](./data) and can be prepared from the original sources using the relevant preparation scripts.
+The data used for our experiments is available in [data](./data) and can be prepared from the original sources using the scripts [here](./data_prep).
 
 # Model Training
 
@@ -63,12 +64,12 @@ python merge_peft_adapter.py \
 
 # Inference
 
-To run inference for the different tasks, use the appropriate `run_inference*` script, specifying the GPU device ID, model directories and evaluation datasets.
+To run inference for the different tasks, use the appropriate `run_inference*.sh` script, specifying the GPU device ID, model directories and evaluation datasets.
 
 ### Chat
 
 ```
-bash scripts/run_inference.sh \
+bash scripts/run_alpaca_inference.sh \
     -d 0 \
     -m resources/models/llama_2_7b_hf_ml2_merged resources/models/llama_2_7b_hf_ml3_merged \
     -t data/alpaca_eval/alpaca_eval_instructions_is.json data/alpaca_eval/alpaca_eval_instructions_el.json data/alpaca_eval/alpaca_eval_instructions_hi.json
@@ -111,4 +112,17 @@ bash scripts/run_llm_judge.sh \
 
 # Results
 
-Plots used in the paper can be generated using [this notebook](./analyses/process_main_results.ipynb).
+Plots used in the paper can be generated using [this notebook](./process_main_results.ipynb).
+
+# Citation
+
+```
+@misc{kew2023turning,
+      title={Turning English-centric LLMs Into Polyglots: How Much Multilinguality Is Needed?}, 
+      author={Tannon Kew and Florian Schottmann and Rico Sennrich},
+      year={2023},
+      eprint={2312.12683},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
