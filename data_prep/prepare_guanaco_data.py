@@ -5,7 +5,7 @@
 
 Example usage:
 
-    python prepare_guanaco_data.py --dataset_path data/guanaco_train.json
+    python prepare_guanaco_data.py
 
 """
 
@@ -33,7 +33,7 @@ lang_set = {
 def set_args():
     ap = argparse.ArgumentParser()
     
-    ap.add_argument("--dataset_path", required=False, default="data/guanaco_train.json", help="path to dataset with lang column")
+    ap.add_argument("--dataset_path", required=False, default="data/guanaco/guanaco_train.json", help="path to dataset with lang column")
     ap.add_argument("--tgt_lang", required=False, default=None, help="target language")
     ap.add_argument("--seed", required=False, default=42, help="random seed")
 
