@@ -8,8 +8,8 @@ from transformers import AutoModelForCausalLM, AutoModelForSequenceClassificatio
 """
 Example call:
     python merge_peft_adapter.py \
-        --adapter_model_name_or_path "/scratch/tannon/trl_models/llama-2-70b-hf_16bit_guanaco/" \
-        --output_dir "llm_dqa/resources/models/llama-2-70b-hf_16bit_guanaco_merged/"
+        --adapter_model_name_or_path <path_to_finetuned_model \
+        --output_dir <output_path>"
 """
 
 @dataclass

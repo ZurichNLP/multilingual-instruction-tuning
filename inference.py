@@ -4,10 +4,10 @@
 """
 
 Example call:
-CUDA_VISIBLE_DEVICES=7 python inference.py resources/models/falcon_7b_de_merged \
-    --input_file data/alpaca_eval_instructions_de.json \
+CUDA_VISIBLE_DEVICES=7 python inference.py resources/models/falcon_7b_ml2_merged \
+    --input_file data/alpaca_eval/alpaca_eval_instructions_de.json \
     --batch_size 8 \
-    --output_path data/outputs \
+    --output_path data/alpaca_eval_outputs \
     --prompt_format prompts/guanaco_prompt \
     --src_key instruction \
     --stop '### Human:' '\n### Human:'

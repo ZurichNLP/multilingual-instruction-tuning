@@ -54,7 +54,7 @@ CUDA_VISIBLE_DEVICES=2,3 nohup python sft_training.py \
     --log_with "wandb" >| resources/models/logs/llama_2_7b_hf_ml2.log &
 ```
 
-Once training is completed, we merge the learned adapters with the base model for easy loading with vLLM.
+Once training is completed, we merge the learned adapters with the base model for easy loading with [vLLM](https://github.com/vllm-project/vllm).
 
 ```
 python merge_peft_adapter.py \
@@ -64,7 +64,7 @@ python merge_peft_adapter.py \
 
 # Inference
 
-To run inference for the different tasks, use the appropriate `run_inference*.sh` script, specifying the GPU device ID, model directories and evaluation datasets.
+To run inference for the different tasks, you can use the appropriate `run_inference*.sh` script ([here](./scripts)), specifying the GPU device ID, model directories and evaluation datasets.
 
 ### Chat
 

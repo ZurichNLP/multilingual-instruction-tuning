@@ -3,11 +3,13 @@
 
 """
 
+Generic translation script for translating a list of texts into a given target language using GPT-3.5-Turbo.
+
 Example call:
 
     python translate_with_gpt.py \
-        --input_file data/outputs/llama_2_7b_hf_de_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
-        --output_file alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8-with_en.jsonl \
+        --input_file data/alpaca_eval_outputs/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
+        --output_file data/alpaca_eval_outputs_translated/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
         --tgt_lang "English" \
         --src_key "system" \
         --model_name "gpt-3.5-turbo-1106" \

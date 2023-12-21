@@ -6,19 +6,22 @@
 This script is used to evaluate a set of responses using LLM as a judge for a 6-point Likert scale assessment.
 
 Example usage:
-
-    python llm_judge_v2.py \
-        --input_file data/outputs/llama_2_7b_hf_de_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8-with_en.jsonl \
+    
+    # direct eval in original language
+    python llm_judge.py \
+        --input_file "data/alpaca_eval_outputs/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_hi-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl" \
         --eval_model_name "gpt-3.5-turbo-1106" \
-        --src_key "source" --tgt_key "system" \
-        --force
+        --src_key "source" \
+        --tgt_key "system" \
+        --api_seed 42 --data_seed 42
 
-    python llm_judge_v2.py \
-        --input_file data/outputs/llama_2_7b_hf_de_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8-with_en.jsonl \
+    # translated eval via English
+    python llm_judge.py \
+        --input_file "data/alpaca_eval_outputs_translated/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_hi-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl" \
         --eval_model_name "gpt-3.5-turbo-1106" \
-        --src_key "source" --tgt_key "system" \
-        --force
-
+        --src_key "source_en" \
+        --tgt_key "system_en" \
+        --api_seed 42 --data_seed 42
 
 """
 
