@@ -35,11 +35,15 @@ If running experiments with OpenAI's API-based models, create a file containing 
 echo "OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'" > api_secrets.py
 ```
 
-# Data and Data Preparation
+# Data and models
+
+The formatted datasets and finetuned models used in our experiments are available on the Hugging Face Hub: https://huggingface.co/collections/tannonk/multilingual-instruction-tuning-65855e8d92eba5ad69df4b2a
+
+## Data Preparation
 
 The data used for our experiments is available in [data](./data) and can be prepared from the original sources using the scripts [here](./data_prep).
 
-# Model Training
+## Model Training
 
 To train a model on a given dataset, use the script `sft_training.py`. For example:
 
