@@ -73,7 +73,7 @@ def set_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--input_file", required=True, type=str, help="Path to input file")
     ap.add_argument("--output_file", required=False, type=str, help="Path to output file")
-    ap.add_argument("--output_dir_base", required=False, default='data/llm_evals', type=str, help="Path to output directory")
+    ap.add_argument("--output_dir_base", required=False, default='data/llm_judge', type=str, help="Path to output directory")
     ap.add_argument("--eval_model_name", required=False, type=str, default="gpt-3.5-turbo-1106", help="Name of the model to use")
     ap.add_argument("--eval_type", required=False, type=str, default="likert", help="Evaluation type (abs|likert)")
     ap.add_argument("--verbose", action="store_true", default=False, help="Verbose")
