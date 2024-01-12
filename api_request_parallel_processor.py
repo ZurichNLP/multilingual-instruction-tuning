@@ -29,11 +29,12 @@ headers = {
 max_retries = 20
 
 costings = {
-        "gpt-3.5-turbo": (0.0015, 0.0020), 
-        "gpt-3.5-turbo-16k": (0.003, 0.004), 
-        "gpt-4": (0.03, 0.06), # 8k context
-        "gpt-3.5-turbo-1106": (0.0010, 0.0020),
-    }
+    "gpt-3.5-turbo": (0.0015, 0.0020), 
+    "gpt-3.5-turbo-16k": (0.003, 0.004), 
+    "gpt-4": (0.03, 0.06), # 8k context
+    "gpt-4-1106-preview": (0.01, 0.03),
+    "gpt-3.5-turbo-1106": (0.0010, 0.0020),
+}
 
 def get_cost(model_name, prompt_tokens, completion_tokens):
     prompt_cost = ((prompt_tokens / 1000) * costings[model_name][0])
