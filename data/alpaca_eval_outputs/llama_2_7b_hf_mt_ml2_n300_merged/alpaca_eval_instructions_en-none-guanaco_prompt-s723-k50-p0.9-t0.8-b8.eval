@@ -1,0 +1,2 @@
+lang_match,tgt_lang,ppl,ppl_model,n,file
+0.948,0.973,,,805,data/alpaca_eval_outputs/llama_2_7b_hf_mt_ml2_n300_merged/alpaca_eval_instructions_en-none-guanaco_prompt-s723-k50-p0.9-t0.8-b8.jsonl
