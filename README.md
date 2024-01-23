@@ -7,7 +7,7 @@ To setup the environment, we recommend using conda, e.g.:
 ```
 conda create -n ml_llm -c conda-forge python=3.10 cudatoolkit=11.8 -y
 conda activate ml_llm
-pip install vllm
+pip install vllm==0.2.1
 pip install -r requirements.txt
 ```
 
