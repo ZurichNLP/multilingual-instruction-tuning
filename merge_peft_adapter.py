@@ -8,7 +8,7 @@ from transformers import AutoModelForCausalLM, AutoModelForSequenceClassificatio
 """
 Example call:
     python merge_peft_adapter.py \
-        --adapter_model_name_or_path <path_to_finetuned_model \
+        --adapter_model_name_or_path <path_to_finetuned_model> \
         --output_dir <output_path>"
 """
 

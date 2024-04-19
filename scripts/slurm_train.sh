@@ -11,7 +11,7 @@
 # Example: sbatch slurm_train.sh "meta-llama/Llama-2-70b-hf" "data/guanaco_train_ml2.json" "data/guanaco_eval.json" "resources/models/llama_2_70b_hf_ml2" "resources/models/logs/llama_2_70b_hf_ml2.log"
 
 # hardcoded defaults
-BASE="/data/tkew/projects/ml-LLM/" # expected path on slurm cluster
+BASE="/data/tkew/projects/multilingual-instruction-tuning" # expected path on slurm cluster
 if [ ! -d "$BASE" ]; then
     echo "Failed to locate BASE directory '$BASE'. Inferring BASE from script path..."
     SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
@@ -19,8 +19,8 @@ if [ ! -d "$BASE" ]; then
 fi
 
 model_name_or_path=$1 # "meta-llama/Llama-2-70b-hf"
-train_dataset=$2 # "data/guanaco_train_ml2.json"
-eval_dataset=$3 # "data/guanaco_test.json"
+train_dataset=$2 # "data/guanaco/guanaco_train_ml2.json"
+eval_dataset=$3 # "data/guanaco/guanaco_test.json"
 output_dir=$4 # resources/models/llama_2_70b_hf_ml2
 log_file=$5 # resources/models/logs/llama_2_70b_hf_ml2.log
 

@@ -10,7 +10,7 @@
 # sbatch slurm_xquad_inference.sh -m resources/models/llama_2_70b_hf_mt_ml1_merged -t data/xquad_dev_*
 
 # hardcoded defaults
-BASE="/data/tkew/projects/ml-LLM/" # expected path on slurm cluster
+BASE="/data/tkew/projects/multilingual-instruction-tuning" # expected path on slurm cluster
 if [ ! -d "$BASE" ]; then
     echo "Failed to locate BASE directory '$BASE'. Inferring BASE from script path..."
     SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"

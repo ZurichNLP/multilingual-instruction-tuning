@@ -6,11 +6,12 @@
 #SBATCH --time=23:59:00
 #SBATCH --partition=lowprio
 
-# Usage: sbatch slurm_inference.sh -m <model_name_or_path> -t <test_datasets>
-# sbatch slurm_inference.sh -m resources/models/llama_2_70b_hf_mt_ml1_merged -t data/alpaca_eval_instructions_*
+# Usage: sbatch scripts/slurm_alpaca_inference.sh -m <model_name_or_path> -t <test_datasets>
+# sbatch scripts/slurm_alpaca_inference.sh -m resources/models/llama_2_70b_hf_mt_ml1_merged -t data/alpaca_eval/alpaca_eval_instructions_*
+# sbatch --gres=gpu:A100:1 scripts/slurm_alpaca_inference.sh -m resources/models/llama_3_8b_ml2_merged -t data/alpaca_eval/alpaca_eval_instructions_*
 
 # hardcoded defaults
-BASE="/data/tkew/projects/ml-LLM/" # expected path on slurm cluster
+BASE="/data/tkew/projects/multilingual-instruction-tuning" # expected path on slurm cluster
 if [ ! -d "$BASE" ]; then
     echo "Failed to locate BASE directory '$BASE'. Inferring BASE from script path..."
     SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"

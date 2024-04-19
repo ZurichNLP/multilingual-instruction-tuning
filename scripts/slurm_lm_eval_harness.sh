@@ -10,7 +10,7 @@
 # sbatch slurm_lm_eval_harness.sh resources/models/llama_2_70b_hf_mt_ml1_merged resources/models/llama_2_70b_hf_mt_ml2_merged resources/models/llama_2_70b_hf_mt_ml3_merged 
 
 # hardcoded defaults
-BASE="/data/tkew/projects/ml-LLM/" # expected path on slurm cluster
+BASE="/data/tkew/projects/multilingual-instruction-tuning" # expected path on slurm cluster
 if [ ! -d "$BASE" ]; then
     echo "Failed to locate BASE directory '$BASE'. Inferring BASE from script path..."
     SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
