@@ -9,6 +9,8 @@
 # Usage: sbatch scripts/slurm_alpaca_inference.sh -m <model_name_or_path> -t <test_datasets>
 # sbatch scripts/slurm_alpaca_inference.sh -m resources/models/llama_2_70b_hf_mt_ml1_merged -t data/alpaca_eval/alpaca_eval_instructions_*
 # sbatch --gres=gpu:A100:1 scripts/slurm_alpaca_inference.sh -m resources/models/llama_3_8b_ml2_merged -t data/alpaca_eval/alpaca_eval_instructions_*
+# sbatch scripts/slurm_alpaca_inference.sh -m resources/models/mixtral_8x7b_ml1_merged -t data/alpaca_eval/alpaca_eval_instructions_*
+# sbatch --gres=gpu:A100:2 scripts/slurm_alpaca_inference.sh -m resources/models/mixtral_8x7b_ml2_merged -t data/alpaca_eval/alpaca_eval_instructions_*
 
 # hardcoded defaults
 BASE="/data/tkew/projects/multilingual-instruction-tuning" # expected path on slurm cluster
@@ -23,7 +25,8 @@ module load anaconda3 multigpu a100
 
 eval "$(conda shell.bash hook)"
 conda activate && echo "CONDA ENV: $CONDA_DEFAULT_ENV"
-conda activate vllm && echo "CONDA ENV: $CONDA_DEFAULT_ENV"
+# conda activate vllm && echo "CONDA ENV: $CONDA_DEFAULT_ENV"
+conda activate ml_mixtral && echo "CONDA ENV: $CONDA_DEFAULT_ENV" # for mixtral models!
 
 cd "${BASE}" && echo $(pwd) || exit 1
 
@@ -95,7 +98,7 @@ for model in "${models[@]}"; do
                 --prompt_format "prompts/guanaco_prompt" \
                 --src_key "instruction" \
                 --stop "### Human:" "### Assistant:" "### Human" "### Assistant" \
-                --n_gpus 4
+                --n_gpus 2
         done
     done
 done
