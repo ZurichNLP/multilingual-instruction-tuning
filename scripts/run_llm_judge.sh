@@ -5,8 +5,8 @@
 # It takes as input the outputs of the LLM models and outputs the evaluation results.
 
 # Example usage:
-# bash run_llm_judge.sh -m llama_2_7b_hf_ml2_merged -l de fr
-
+# bash scripts/run_llm_judge.sh -m llama_2_7b_hf_ml2_merged -l de fr
+# bash scripts/run_llm_judge.sh -m llama_3_8b_ml2_merged -l en de fr zh ru
 
 set -e
 
