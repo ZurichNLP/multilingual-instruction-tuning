@@ -5,8 +5,10 @@
 # It takes as input the outputs of the LLM models and outputs the evaluation results.
 
 # Example usage:
-# bash scripts/run_llm_judge.sh -m llama_2_7b_hf_ml2_merged -l de fr
-# bash scripts/run_llm_judge.sh -m llama_3_8b_ml2_merged -l en de fr zh ru
+# # with translation 
+# bash scripts/run_llm_judge.sh -m llama_2_7b_hf_ml6_merged -l ko vi hu fi -limit 300 -t true
+# without translation
+# bash scripts/run_llm_judge.sh -m llama_3_8b_ml2_merged -l en de fr zh ru -limit 300
 
 set -e
 
@@ -17,6 +19,7 @@ seeds=(0 42 723) # default seeds
 translation_model="gpt-3.5-turbo-1106"
 evaluation_model="gpt-3.5-turbo-1106"
 evaluate_with_translations=false
+limit=-1
 
 # Loop to parse arguments
 while [[ $# -gt 0 ]]; do
@@ -50,6 +53,11 @@ while [[ $# -gt 0 ]]; do
             evaluate_with_translations=true
             shift
             ;;
+        -limit)
+            shift
+            limit="$1"
+            shift
+            ;;
         *)
             echo "Unknown option: $1"
             exit 1
@@ -75,29 +83,37 @@ echo "evaluate_with_translations: ${evaluate_with_translations}"
 
 for model in "${models[@]}"; do
     for lang in "${langs[@]}"; do
-        for seed in "${seeds[@]}"; do
+        
+        # find all infile paths
+        infiles=$( (find "data/alpaca_eval_outputs/${model}" -type f -name "alpaca_eval_instructions_${lang}-none-guanaco_prompt-s*.jsonl") )
+        
+        for infile in ${infiles[@]}; do
     
             echo ""
-            echo "*** Running evaluation pipeline for model: ${model}, lang: ${lang}, seed: ${seed} ***"
+            echo "*** Running evaluation pipeline for model: ${infile} ***"
             echo ""
-
+    
             if [ "$evaluate_with_translations" = true ] && [ "${lang}" != "en" ]; then
     
                 echo "*** Translating non-English responses to English... ***"
+                
+                translated_infile="data/alpaca_eval_outputs_translated/${model}/$(basename "$infile")"
+                
                 # step 1: translate non-English responses to English
                 python translate_with_gpt.py \
-                    --input_file "data/alpaca_eval_outputs/${model}/alpaca_eval_instructions_${lang}-none-guanaco_prompt-s${seed}-k50-p0.9-t0.8-b8.jsonl" \
-                    --output_file "data/alpaca_eval_outputs_translated/${model}/alpaca_eval_instructions_${lang}-none-guanaco_prompt-s${seed}-k50-p0.9-t0.8-b8.jsonl" \
+                    --input_file "${infile}" \
+                    --output_file "${translated_infile}" \
                     --tgt_lang "English" \
                     --src_key "system" \
-                    --limit 300 --data_seed 42 --api_seed 42 \
+                    --limit "${limit}" --data_seed 42 --api_seed 42 \
                     --model_name "${translation_model}" \
-                    --original_prompts "data/alpaca_eval_instructions_en.json"
-
+                    --dataset_type "alpaca_eval_outputs" --original_prompts "data/alpaca_eval/alpaca_eval_instructions_en.json"
+                    
+            
                 echo "*** Evaluating translated responses... ***"
                 # step 2: evaluate translated English responses
                 python llm_judge.py \
-                    --input_file "data/alpaca_eval_outputs_translated/${model}/alpaca_eval_instructions_${lang}-none-guanaco_prompt-s${seed}-k50-p0.9-t0.8-b8.jsonl" \
+                    --input_file "${translated_infile}" \
                     --eval_model_name "${evaluation_model}" \
                     --src_key "source_en" \
                     --tgt_key "system_en" \
@@ -108,12 +124,11 @@ for model in "${models[@]}"; do
             echo "*** Evaluating non-translated responses directly... ***"
             # step 1: evaluate the original English responses
             python llm_judge.py \
-                --input_file "data/alpaca_eval_outputs/${model}/alpaca_eval_instructions_${lang}-none-guanaco_prompt-s${seed}-k50-p0.9-t0.8-b"*".jsonl" \
+                --input_file "${infile}" \
                 --eval_model_name "${evaluation_model}" \
                 --src_key "source" \
                 --tgt_key "system" \
-                --limit 300 --api_seed 42 --data_seed 42 \
-                --api_seed 42 --data_seed 42
+                --limit "${limit}" --api_seed 42 --data_seed 42
 
 
         done
