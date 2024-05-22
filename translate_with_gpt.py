@@ -7,6 +7,16 @@ Generic translation script for translating a list of texts into a given target l
 
 Example call:
 
+    # for prompt translation (preparation of Alpaca Eval instructions for evaluation in multiple languages)
+    python translate_with_gpt.py \
+        --input_file data/alpaca_eval/alpaca_eval_instructions_en.json \
+        --output_file data/alpaca_eval/alpaca_eval_instructions_no.json \
+        --tgt_lang "Norwegian" \
+        --src_key "instruction" \
+        --model_name "gpt-3.5-turbo-0613" \
+        --dataset_type "alpaca_eval_prompts"
+
+    # for translating generated outputs (e.g. from Alpaca Eval) into English for evaluation ablations
     python translate_with_gpt.py \
         --input_file data/alpaca_eval_outputs/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
         --output_file data/alpaca_eval_outputs_translated/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
@@ -14,6 +24,8 @@ Example call:
         --src_key "system" \
         --model_name "gpt-3.5-turbo-1106" \
         --original_prompts data/alpaca_eval_instructions_en.json --debug --force
+
+        
 
 """
 
@@ -52,15 +64,14 @@ def set_args():
     ap.add_argument("--debug", action="store_true")
     ap.add_argument("--inspect_only", action="store_true")
     ap.add_argument("--max_tokens", type=int, default=2048)
-    # ap.add_argument("--dataset_type", type=str, default="alpaca_eval_outputs")
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--data_seed", type=int, default=42)
     ap.add_argument("--api_seed", type=int, default=42)
     ap.add_argument("--max_parallel_calls", type=int, default=5)
     ap.add_argument("--timeout", type=int, default=120)
     ap.add_argument("--temperature", type=float, default=0.0)
-    
     ap.add_argument("--force", action="store_true", help="Overwrite output file if it already exists")
+    ap.add_argument("--dataset_type", type=str, default="alpaca_eval_outputs", choices=["alpaca_eval_outputs", "alpaca_eval_prompts"], help="'outputs' refers to the generated responses which we translate for direct vs. translation evaluation ablations. 'Prompts' refers to the original prompts that we translate into multiple target languages for evaluations.")
     ap.add_argument("--original_prompts", default=None, type=str, help="Path to original prompts file if required, e.g. for Alpaca Eval: data/alpaca_eval_instructions_en.json")
 
     return ap.parse_args()
@@ -86,14 +97,15 @@ if __name__ == "__main__":
         Path(output_file).parent.mkdir(parents=True, exist_ok=True)
         logger.info(f"Writing to {output_file}")
 
-    if args.original_prompts:
-        # get the original prompts as well
-        en_prompts = pd.read_json(args.original_prompts, lines=True).rename(columns={"instruction": "source_en"})
-        # merge the original prompts with the data
-        data = pd.concat([data, en_prompts], axis=1)
-    else:
-        raise ValueError("Please specify the path to the original prompts file with --original_prompts")
-
+    if args.dataset_type == "alpaca_eval_outputs":
+        if args.original_prompts:
+            # get the original prompts as well
+            en_prompts = pd.read_json(args.original_prompts, lines=True).rename(columns={"instruction": "source_en"})
+            # merge the original prompts with the data
+            data = pd.concat([data, en_prompts], axis=1)
+        else:
+            raise ValueError("Please specify the path to the original prompts file with --original_prompts")
+    
     if 'id' not in data.columns:
         data['id'] = data.index # persist original index
     
@@ -143,18 +155,26 @@ if __name__ == "__main__":
     # check that results match data
     assert len(data) == len(results), f"Length of data ({len(data)}) and results ({len(results)}) do not match!"
 
+
     c = 0
     with open(output_file, "w", encoding="utf8") as outf:
         for item, result in zip(data, results):
-            item[f'{args.src_key}_en'] = result['content']
-            item['translation_meta'] = {
-                "system_fingerprint": result['system_fingerprint'],
-                "prompt_tokens": result['prompt_tokens'],
-                "completion_tokens": result['completion_tokens'],
-                "cost": result['cost'],
-                "model_name": result['model_name'],
-                }
+            if args.dataset_type == "alpaca_eval_prompts":
+                item['instruction'] = result['content']
+                del item['id']
+
+            elif args.dataset_type == "alpaca_eval_outputs":
+                item[f'{args.src_key}_en'] = result['content']
+                item['translation_meta'] = {
+                    "system_fingerprint": result['system_fingerprint'],
+                    "prompt_tokens": result['prompt_tokens'],
+                    "completion_tokens": result['completion_tokens'],
+                    "cost": result['cost'],
+                    "model_name": result['model_name'],
+                    }
+            
             outf.write(f"{json.dumps(item, ensure_ascii=False)}\n")
+            
             c += 1
 
     logger.info(f"Wrote {c} items to {output_file}")

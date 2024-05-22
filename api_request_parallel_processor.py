@@ -34,6 +34,7 @@ costings = {
     "gpt-4": (0.03, 0.06), # 8k context
     "gpt-4-1106-preview": (0.01, 0.03),
     "gpt-3.5-turbo-1106": (0.0010, 0.0020),
+    "gpt-3.5-turbo-0613": (0.0015, 0.0020),
 }
 
 def get_cost(model_name, prompt_tokens, completion_tokens):
