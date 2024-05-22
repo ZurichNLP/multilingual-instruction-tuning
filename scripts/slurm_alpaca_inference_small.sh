@@ -8,6 +8,7 @@
 
 # Usage: sbatch scripts/slurm_alpaca_inference_small.sh -m <model_name_or_path> -t <test_datasets>
 # sbatch scripts/slurm_alpaca_inference_small.sh -m resources/models/llama_3_8b_ml2_merged -t data/alpaca_eval/alpaca_eval_instructions_*
+# sbatch scripts/slurm_alpaca_inference_small.sh -m resources/models/leo_7b_ml1_merged -t data/alpaca_eval/alpaca_eval_instructions_*
 
 # hardcoded defaults
 BASE="/data/tkew/projects/multilingual-instruction-tuning" # expected path on slurm cluster
@@ -18,7 +19,7 @@ if [ ! -d "$BASE" ]; then
 fi
 
 module purge
-module load anaconda3 multigpu a100
+module load anaconda3 multigpu
 
 eval "$(conda shell.bash hook)"
 conda activate && echo "CONDA ENV: $CONDA_DEFAULT_ENV"

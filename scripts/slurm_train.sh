@@ -9,6 +9,9 @@
 
 # Usage: sbatch slurm_train.sh <model_name_or_path> <train_dataset> <eval_dataset> <output_dir> <log_file>
 # Example: sbatch slurm_train.sh "meta-llama/Llama-2-70b-hf" "data/guanaco_train_ml2.json" "data/guanaco_eval.json" "resources/models/llama_2_70b_hf_ml2" "resources/models/logs/llama_2_70b_hf_ml2.log"
+# sbatch scripts/slurm_train.sh "mistralai/Mixtral-8x7B-v0.1" "data/guanaco/guanaco_train_ml1.json" "data/guanaco/guanaco_test.json" "resources/models/mixtral_8x7b_ml1" "resources/models/logs/mixtral_8x7b_ml1.log"
+# sbatch scripts/slurm_train.sh "mistralai/Mixtral-8x7B-v0.1" "data/guanaco/guanaco_train_ml2.json" "data/guanaco/guanaco_test.json" "resources/models/mixtral_8x7b_ml2" "resources/models/logs/mixtral_8x7b_ml2.log"
+# sbatch scripts/slurm_train.sh "mistralai/Mixtral-8x7B-v0.1" "data/guanaco/guanaco_train_ml3.json" "data/guanaco/guanaco_test.json" "resources/models/mixtral_8x7b_ml3" "resources/models/logs/mixtral_8x7b_ml3.log"
 
 # hardcoded defaults
 BASE="/data/tkew/projects/multilingual-instruction-tuning" # expected path on slurm cluster
@@ -29,7 +32,15 @@ module load anaconda3 multigpu a100
 
 eval "$(conda shell.bash hook)"
 conda activate && echo "CONDA ENV: $CONDA_DEFAULT_ENV"
-conda activate vllm && echo "CONDA ENV: $CONDA_DEFAULT_ENV"
+if [[ "$model_name_or_path" == "meta-llama"* ]]; then
+    conda activate llama && echo "CONDA ENV: $CONDA_DEFAULT_ENV"
+elif [[ "$model_name_or_path" == "mistralai"* ]]; then
+    conda activate ml_mixtral && echo "CONDA ENV: $CONDA_DEFAULT_ENV"
+else
+    echo "Unknown model_name_or_path: $model_name_or_path"
+    exit 1
+fi
+# conda activate vllm && echo "CONDA ENV: $CONDA_DEFAULT_ENV"
 
 cd "${BASE}" && echo $(pwd) || exit 1
 

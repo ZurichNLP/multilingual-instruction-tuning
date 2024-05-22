@@ -9,6 +9,9 @@
 
 # Usage: sbatch scripts/slurm_train_small.sh <model_name_or_path> <train_dataset> <eval_dataset> <output_dir> <log_file>
 # Example: sbatch scripts/slurm_train_small.sh "meta-llama/Meta-Llama-3-8B" "data/guanaco/guanaco_train_ml2.json" "data/guanaco/guanaco_test.json" "resources/models/llama_3_8b_ml2" "resources/models/logs/llama_3_8b_ml2.log"
+# sbatch scripts/slurm_train_small.sh "LeoLM/leo-hessianai-7b" "data/guanaco/guanaco_train_ml1.json" "data/guanaco/guanaco_test.json" "resources/models/leo_7b_ml1" "resources/models/logs/leo_7b_ml1.log"
+# sbatch scripts/slurm_train_small.sh "LeoLM/leo-hessianai-7b" "data/guanaco/guanaco_train_ml2.json" "data/guanaco/guanaco_test.json" "resources/models/leo_7b_ml2" "resources/models/logs/leo_7b_ml2.log"
+# sbatch scripts/slurm_train_small.sh "LeoLM/leo-hessianai-7b" "data/guanaco/guanaco_train_ml3.json" "data/guanaco/guanaco_test.json" "resources/models/leo_7b_ml3" "resources/models/logs/leo_7b_ml3.log"
 
 BASE="/data/tkew/projects/multilingual-instruction-tuning" # expected path on slurm cluster
 if [ ! -d "$BASE" ]; then
@@ -51,5 +54,21 @@ python sft_training.py \
     --per_device_train_batch_size 4 --per_device_eval_batch_size 4 --gradient_accumulation_steps 4 \
     --log_with "wandb" 2>&1 | tee "${log_file}"
 
-
 echo "Training started..."
+
+# Capture the exit status of the Python command
+status=${PIPESTATUS[0]}
+
+# Check if the Python script was successful
+if [ $status -ne 0 ]; then
+   echo "Python script failed with status $status. Exiting."
+   exit $status
+else
+    echo "Training completed successfully."    
+fi
+# merge adapters once training is done
+python merge_peft_adapter.py \
+    --adapter_model_name_or_path "${output_dir}" \
+    --output_dir "${output_dir}_merged"
+
+echo "Merged adapters."
