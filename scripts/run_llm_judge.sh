@@ -19,7 +19,7 @@ seeds=(0 42 723) # default seeds
 translation_model="gpt-3.5-turbo-1106"
 evaluation_model="gpt-3.5-turbo-1106"
 evaluate_with_translations=false
-limit=-1
+limit=300
 
 # Loop to parse arguments
 while [[ $# -gt 0 ]]; do
