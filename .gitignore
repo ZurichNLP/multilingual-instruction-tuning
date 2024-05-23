@@ -179,3 +179,4 @@ data_prep/prepare_xnli.ipynb
 scripts/run_xnli_inference.sh
 instruction_visualize.ipynb
 data/xnli/
+*.eval
