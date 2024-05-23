@@ -112,7 +112,11 @@ if __name__ == "__main__":
 
     Path(output_file).parent.mkdir(parents=True, exist_ok=True)
 
-    judge = PrometheusEval(model_id=args.eval_model_name, absolute_grade_template=ABSOLUTE_PROMPT)
+    if args.eval_model_name == "prometheus-eval/prometheus-8x7b-v2.0":
+        logger.info("Using 2 GPUs for Prometheus 8x7b model ...")
+        judge = PrometheusEval(model_id=args.eval_model_name, absolute_grade_template=ABSOLUTE_PROMPT, num_gpus=2)
+    else:
+        judge = PrometheusEval(model_id=args.eval_model_name, absolute_grade_template=ABSOLUTE_PROMPT, num_gpus=1)
 
     score_rubric = SCORE_RUBRIC_TEMPLATE.format(**rubric_data)    
     feedbacks, scores = judge.absolute_grade(
