@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --gres=gpu:A100:4
+#SBATCH --gres=gpu:A100:2
 #SBATCH --mem=256GB
 #SBATCH --time=23:59:00
 #SBATCH --partition=lowprio
+
+# Note: use --gres=gpu:A100:4 for llama 70b models
 
 # Usage: sbatch scripts/slurm_alpaca_inference.sh -m <model_name_or_path> -t <test_datasets>
 # sbatch scripts/slurm_alpaca_inference.sh -m resources/models/llama_2_70b_hf_mt_ml1_merged -t data/alpaca_eval/alpaca_eval_instructions_*
@@ -25,8 +27,8 @@ module load anaconda3 multigpu a100
 
 eval "$(conda shell.bash hook)"
 conda activate && echo "CONDA ENV: $CONDA_DEFAULT_ENV"
-# conda activate vllm && echo "CONDA ENV: $CONDA_DEFAULT_ENV"
-conda activate ml_mixtral && echo "CONDA ENV: $CONDA_DEFAULT_ENV" # for mixtral models!
+conda activate vllm && echo "CONDA ENV: $CONDA_DEFAULT_ENV" # for llama2/falcon models!
+# conda activate ml_mixtral && echo "CONDA ENV: $CONDA_DEFAULT_ENV" # for mixtral/llama3 models!
 
 cd "${BASE}" && echo $(pwd) || exit 1
 
