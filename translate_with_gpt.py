@@ -64,7 +64,7 @@ def set_args():
     ap.add_argument("--debug", action="store_true")
     ap.add_argument("--inspect_only", action="store_true")
     ap.add_argument("--max_tokens", type=int, default=2048)
-    ap.add_argument("--limit", type=int, default=None)
+    ap.add_argument("--limit", type=int, default=-1)
     ap.add_argument("--data_seed", type=int, default=42)
     ap.add_argument("--api_seed", type=int, default=42)
     ap.add_argument("--max_parallel_calls", type=int, default=5)
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     if 'id' not in data.columns:
         data['id'] = data.index # persist original index
     
-    if args.limit:
+    if args.limit > 0:
             # sample the data up to the limit        
             data = data.sample(n=min(args.limit, len(data)), random_state=args.data_seed).reset_index(drop=True)
 

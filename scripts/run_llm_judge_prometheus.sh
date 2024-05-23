@@ -12,6 +12,7 @@
 # nohup bash scripts/run_llm_judge_prometheus.sh -m llama_2_7b_hf_ml1_merged llama_2_7b_hf_ml3_merged llama_2_7b_hf_ml4_merged llama_2_7b_hf_ml2_merged llama_2_7b_hf_ml5_merged llama_2_7b_hf_ml6_merged llama_2_7b_hf_guanaco_merged -l de en fr zh ru es ca sv bg no is hi el hu fi vi ko -gpu 3 -limit 300 > logs/prometheus_direct_eval.log &
 # bash scripts/run_llm_judge_prometheus.sh -m llama_2_7b_hf_ml2_merged -l de fr zh ru -gpu 0 -limit 300
 # bash scripts/run_llm_judge_prometheus.sh -m llama_3_8b_ml2_merged -l de fr zh ru -gpu 0 -limit 300 -t
+# bash scripts/run_llm_judge_prometheus.sh -em prometheus-eval/prometheus-8x7b-v2.0 -m llama_2_7b_hf_ml2_merged -l de -limit 300 -t true
 
 set -e
 
@@ -22,7 +23,7 @@ seeds=(0 42 723) # default seeds
 translation_model="gpt-3.5-turbo-1106"
 evaluation_model="prometheus-eval/prometheus-7b-v2.0"
 evaluate_with_translations=false
-gpu="0"
+gpu=""
 limit="-1"
 
 # Loop to parse arguments
@@ -62,6 +63,11 @@ while [[ $# -gt 0 ]]; do
             gpu="$1"
             shift
             ;;
+        -em)
+            shift
+            evaluation_model="$1"
+            shift
+            ;;
         -limit)
             shift
             limit="$1"
@@ -85,10 +91,16 @@ if [ -z "${langs}" ]; then
     exit 1
 fi
 
+# not needed if using slurm
+if [ ! -z "${gpu}" ]; then
+    export CUDA_VISIBLE_DEVICES="${gpu}"
+fi
+
 echo "models: ${models[@]}"
 echo "langs: ${langs[@]}"
 echo "seeds: ${seeds[@]}"
 echo "evaluate_with_translations: ${evaluate_with_translations}"
+
 
 for model in "${models[@]}"; do
     for lang in "${langs[@]}"; do
@@ -120,7 +132,7 @@ for model in "${models[@]}"; do
 
                 echo "*** Evaluating translated responses... ***"
                 # step 2: evaluate translated English responses
-                CUDA_VISIBLE_DEVICES="${gpu}" python llm_judge_prometheus.py \
+                python llm_judge_prometheus.py \
                     --input_file "${translated_infile}" \
                     --eval_model_name "${evaluation_model}" \
                     --src_key "source_en" \
@@ -131,9 +143,8 @@ for model in "${models[@]}"; do
 
             echo "*** Evaluating non-translated responses directly... ***"
             # step 1: evaluate the original English responses
-            CUDA_VISIBLE_DEVICES="${gpu}" python llm_judge_prometheus.py \
+            python llm_judge_prometheus.py \
                 --input_file "${infile}" \
-                --eval_model_name "${evaluation_model}" \
                 --eval_model_name "${evaluation_model}" \
                 --src_key "source" \
                 --tgt_key "system" \
