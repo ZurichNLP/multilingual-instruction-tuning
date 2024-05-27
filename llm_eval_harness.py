@@ -80,6 +80,7 @@ tasks_per_fewshot = {
         "xnli_bg",
         "xnli_el",
         "xnli_hi",
+        "xnli_vi",
     ]
 }
 

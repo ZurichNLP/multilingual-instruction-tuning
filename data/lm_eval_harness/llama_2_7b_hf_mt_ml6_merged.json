@@ -76,6 +76,10 @@
       "acc": 0.36207584830339323,
       "acc_stderr": 0.006790609942093568
     },
+    "xnli_vi": {
+      "acc": 0.37584830339321357,
+      "acc_stderr": 0.006843461981812768
+    },
     "xwinograd_en": {
       "acc": 0.884731182795699,
       "acc_stderr": 0.006624353863357479
@@ -118,6 +122,7 @@
     "xnli_hi": 0,
     "xnli_ru": 0,
     "xnli_zh": 0,
+    "xnli_vi": 0,
     "xwinograd_en": 0,
     "xwinograd_fr": 0,
     "xwinograd_jp": 0,
