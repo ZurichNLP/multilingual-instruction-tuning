@@ -180,3 +180,4 @@ scripts/run_xnli_inference.sh
 instruction_visualize.ipynb
 data/xnli/
 *.eval
+data/lm_eval_harness2/

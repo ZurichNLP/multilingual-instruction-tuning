@@ -3,7 +3,7 @@
 
 # This script runs inference for a given set of models and test sets.
 # Example call:
-# bash run_xcsqa_inference.sh -d 7 -m resources/models/llama_2_7b_hf_de_merged resources/models/llama_2_7b_hf_ca_merged -t data/xcsr_dev_en_*
+# bash scripts/run_xcsqa_inference.sh -d 7 -m resources/models/llama_2_7b_hf_de_merged resources/models/llama_2_7b_hf_ca_merged -t data/xcsr_dev_en_*
 
 # Variables to hold arguments for -m and -t
 declare -a models
