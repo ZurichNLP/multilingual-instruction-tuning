@@ -178,5 +178,6 @@ data_prep/prepare_xnli.ipynb
 scripts/run_xnli_inference.sh
 instruction_visualize.ipynb
 data/xnli/
+data/alpaca_eval_outputs/
 *.eval
 data/lm_eval_harness2/
