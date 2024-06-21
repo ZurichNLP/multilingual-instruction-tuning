@@ -171,13 +171,10 @@ logs/
 v1_datasets/
 private/
 lm_cache/
-data/xnli_outputs/
 data_prep/compare_ids.ipynb
 data_prep/prepare_custom_train_recipe.ipynb
 data_prep/prepare_xnli.ipynb
 scripts/run_xnli_inference.sh
 instruction_visualize.ipynb
-data/xnli/
-data/alpaca_eval_outputs/
+outputs/
 *.eval
-data/lm_eval_harness2/
