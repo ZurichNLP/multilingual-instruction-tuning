@@ -1,2 +1,0 @@
-lang_match,tgt_lang,ppl,ppl_model,n,file
-0.939,0.961,,,805,data/alpaca_eval_outputs/mixtral_8x7b_ml1_merged/alpaca_eval_instructions_en-none-guanaco_prompt-s42-k50-p0.9-t0.8-b128.jsonl
