@@ -6,7 +6,7 @@
 Example call:
 
     python -m evaluation \
-        data/alpaca_eval_outputs/llama_2_7b_hf_ml1_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
+        resources/outputs/alpaca_eval/llama_2_7b_hf_ml1_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
         --lang de \
         --src_key source \
         --tgt_key system

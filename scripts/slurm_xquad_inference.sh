@@ -92,7 +92,7 @@ for model in "${models[@]}"; do
                 --input_file "${test_set}" \
                 --batch_size 128 \
                 --seed "${seed}" \
-                --output_path "data/xquad_outputs" \
+                --output_path "resources/outputs/xquad" \
                 --prompt_format "prompts/blank" \
                 --src_key "instruction" --tgt_key "answer" \
                 --stop "### Human:" "### Assistant:" "### Human" "### Assistant" \

@@ -9,7 +9,7 @@ Example usage:
     
     # direct eval in original language
     python llm_judge.py \
-        --input_file "data/alpaca_eval_outputs/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_hi-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl" \
+        --input_file "resources/outputs/alpaca_eval/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_hi-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl" \
         --eval_model_name "gpt-3.5-turbo-1106" \
         --src_key "source" \
         --tgt_key "system" \
@@ -17,7 +17,7 @@ Example usage:
 
     # translated eval via English
     python llm_judge.py \
-        --input_file "data/alpaca_eval_outputs_translated/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_hi-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl" \
+        --input_file "resources/outputs/alpaca_eval_translated/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_hi-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl" \
         --eval_model_name "gpt-3.5-turbo-1106" \
         --src_key "source_en" \
         --tgt_key "system_en" \

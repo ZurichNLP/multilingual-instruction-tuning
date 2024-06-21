@@ -7,7 +7,7 @@ Example call:
 CUDA_VISIBLE_DEVICES=7 python inference.py resources/models/falcon_7b_ml2_merged \
     --input_file data/alpaca_eval/alpaca_eval_instructions_de.json \
     --batch_size 8 \
-    --output_path data/alpaca_eval_outputs \
+    --output_path resources/outputs/alpaca_eval \
     --prompt_format prompts/guanaco_prompt \
     --src_key instruction \
     --stop '### Human:' '\n### Human:'

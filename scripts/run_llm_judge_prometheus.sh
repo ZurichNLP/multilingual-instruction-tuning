@@ -106,7 +106,7 @@ for model in "${models[@]}"; do
     for lang in "${langs[@]}"; do
 
         # find all infile paths
-        infiles=$( (find "data/alpaca_eval_outputs/${model}" -type f -name "alpaca_eval_instructions_${lang}-none-guanaco_prompt-s*.jsonl") )
+        infiles=$( (find "resources/outputs/alpaca_eval/${model}" -type f -name "alpaca_eval_instructions_${lang}-none-guanaco_prompt-s*.jsonl") )
         
         for infile in ${infiles[@]}; do
     
@@ -118,7 +118,7 @@ for model in "${models[@]}"; do
     
                 echo "*** Translating non-English responses to English... ***"
                 
-                translated_infile="data/alpaca_eval_outputs_translated/${model}/$(basename "$infile")"
+                translated_infile="resources/outputs/alpaca_eval_translated/${model}/$(basename "$infile")"
                 
                 # step 1: translate non-English responses to English
                 python translate_with_gpt.py \

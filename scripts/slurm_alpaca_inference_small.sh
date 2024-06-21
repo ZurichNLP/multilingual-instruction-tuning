@@ -91,7 +91,7 @@ for model in "${models[@]}"; do
                 --input_file "${test_set}" \
                 --batch_size 128 \
                 --seed "${seed}" \
-                --output_path "data/alpaca_eval_outputs" \
+                --output_path "resources/outputs/alpaca_eval" \
                 --prompt_format "prompts/guanaco_prompt" \
                 --src_key "instruction" \
                 --stop "### Human:" "### Assistant:" "### Human" "### Assistant" \
