@@ -10,7 +10,7 @@ Example usage:
     
     # direct eval in original language
     CUDA_VISIBLE_DEVICES=0 python llm_judge_prometheus.py \
-        --input_file "data/alpaca_eval_outputs/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_en-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl" \
+        --input_file "resources/outputs/alpaca_eval/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_en-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl" \
         --eval_model_name "prometheus-eval/prometheus-7b-v2.0" \
         --src_key "source" \
         --tgt_key "system" \

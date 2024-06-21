@@ -18,8 +18,8 @@ Example call:
 
     # for translating generated outputs (e.g. from Alpaca Eval) into English for evaluation ablations
     python translate_with_gpt.py \
-        --input_file data/alpaca_eval_outputs/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
-        --output_file data/alpaca_eval_outputs_translated/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
+        --input_file resources/outputs/alpaca_eval/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
+        --output_file resources/outputs/alpaca_eval_translated/llama_2_7b_hf_ml6_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
         --tgt_lang "English" \
         --src_key "system" \
         --model_name "gpt-3.5-turbo-1106" \
