@@ -5,11 +5,21 @@
 
 Example call:
 
-    python -m evaluation \
+    python -m evaluation_with_sari \
         resources/outputs/alpaca_eval/llama_2_7b_hf_ml1_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8.jsonl \
         --lang de \
         --src_key source \
         --tgt_key system
+
+    
+    # identity for BLEU score
+    python -m evaluation_with_sari \
+        resources/outputs/multisim/llama_2_7b_hf_ml1_merged/de_de-none-blank-s0-k50-p0.9-t0.8-b128.jsonl \
+        --lang de \
+        --src_key orig_source \
+        --tgt_key orig_source \
+        --ref_key reference \
+        --output_file de_de_identity
 
 """
 
@@ -33,8 +43,8 @@ from open_lid import LIDModel
 mpn = MosesPunctNormalizer()
 bleu = evaluate.load('sacrebleu')
 chrf = evaluate.load('chrf')
-comet = evaluate.load('comet')
 sari = evaluate.load('sari')
+# comet = evaluate.load('comet')
 perplexity = evaluate.load('perplexity', module_type='metric')
 
 def set_args():
@@ -63,6 +73,34 @@ def tokenize_texts(texts: List[str], lang: str = 'en') -> List[str]:
     mt = MosesTokenizer(lang=lang)
     return [mt.tokenize(mpn.normalize(text), return_str=True) for text in texts]
 
+# def compute_bleu(
+#     predictions: List[str], 
+#     references: List[List[str]], 
+#     lang: str = 'en',
+#     ) -> Dict:
+#     """
+#     https://huggingface.co/spaces/evaluate-metric/google_bleu
+    
+#     ! Unlike sacrebleu, google_bleu allows for different number of references per prediction.
+
+#     predictions = ['It is a guide to action which ensures that the rubber duck always disobeys the commands of the cat', 'he read the book because he was interested in world history']
+#     references  = [['It is the guiding principle which guarantees the rubber duck forces never being under the command of the cat', 'It is a guide to action that ensures that the rubber duck will never heed the cat commands', 'It is the practical guide for the rubber duck army never to heed the directions of the cat'], ['he was interested in world history because he read the book']]
+#     results = google_bleu.compute(predictions=predictions, references=references)
+#     print(round(results["google_bleu"], 2))
+#     """ 
+    
+#     # if kwargs.get('verbose'):
+#     logger.info(f'Computing BLEU with {len(predictions)} predictions and {len(references)} references...')
+    
+#     # sacrebleu applies tokenization to the predictions and references separately, 
+#     # but can override this behavior by passing setting force=True
+#     if lang == 'zh':
+#         tokenize = 'zh'
+#     else:
+#         tokenize = '13a'
+
+#     return bleu.compute(predictions=predictions, references=references)['google_bleu']
+
 def compute_bleu(
     predictions: List[str], 
     references: List[List[str]], 
@@ -88,6 +126,11 @@ def compute_bleu(
     else:
         tokenize = '13a'
 
+    n_refs = Counter([len(refs) for refs in references])
+    if len(n_refs) > 1:
+        logger.warning(f"Found different number of references per prediction: {n_refs}, but SacreBLEU expects the same number of references for each prediction. Using the first reference for each prediction.")
+        references = [refs[0] for refs in references]
+
     return bleu.compute(predictions=predictions, references=references, tokenize=tokenize)['score']
 
 def compute_chrf(
@@ -96,16 +139,19 @@ def compute_chrf(
     lang: str = 'en',
     ) -> Dict:
     """
+    Note, a limitation of this implementation is that it does not handle different number of references per prediction:
+        "ChrF, as implemented by sacrebleu, requires the same number of references for each prediction"
+
     """
 
     # if kwargs.get('verbose'):
     logger.info(f'Computing chrF with {len(predictions)} predictions and {len(references)} references...')
-        
+    
     n_refs = Counter([len(refs) for refs in references])
     if len(n_refs) > 1:
         logger.warning(f"Found different number of references per prediction: {n_refs}, but chrF expects the same number of references for each prediction. Using the first reference for each prediction.")
         references = [refs[0] for refs in references]
-    
+
     return chrf.compute(predictions=predictions, references=references, 
                         char_order=2, beta=2
                         )['score']
@@ -114,6 +160,7 @@ def compute_sari(
     predictions: List[str], 
     references: List[List[str]], 
     sources: List[str], 
+    lang: str = 'en',
     ) -> Dict:
     """
     """
@@ -122,35 +169,6 @@ def compute_sari(
 
     return sari.compute(predictions=predictions, references=references, sources=sources)['sari']
 
-
-def compute_comet(
-    predictions: List[str],
-    references: List[List[str]],
-    sources: List[str],
-    ):
-    """
-    COMET takes 3 lists of strings as input: 
-        sources (a list of source sentences), 
-        predictions (a list of candidate translations)
-        references (a list of reference translations).
-
-    from evaluate import load
-    comet_metric = load('comet')
-    x = ["Dem Feuer konnte Einhalt geboten werden", "Schulen und Kindergärten wurden eröffnet."]
-    y = ["The fire could be stopped", "Schools and kindergartens were open"]
-    y_ref = ["They were able to control the fire.", "Schools and kindergartens opened"]
-    comet_score = comet_metric.c
-    """
-
-    logger.info(f'Computing COMET with {len(predictions)} predictions and {len(references)} references...')
-
-    # reshape references to match predictions
-    if isinstance(references[0], list):
-        references = [ref[0] for ref in references]
-    
-    scores = comet.compute(predictions=predictions, references=references, sources=sources)
-
-    return scores['mean_score']
 
 def compute_perplexity(
     predictions: List[str], 
@@ -198,6 +216,8 @@ def compute_perplexity(
                 return None
     
     return ppl_scores['mean_perplexity'], model_id     
+
+
 
 def calculate_agreement(src_langs, tgt_langs):
     """calculates the proportion of positions at which the two lists have equal values, i.e. agreement"""
@@ -248,6 +268,7 @@ def main(args):
     if args.ref_key is not None and args.ref_key in data.columns:
         refs_sents = data[args.ref_key].to_list()
         # # if we have multiple references per sample, we need to transpose the list of lists
+        
         if isinstance(refs_sents[0], list):
             if len(refs_sents) == len(sys_sents):
                 pass
@@ -255,16 +276,8 @@ def main(args):
                 refs_sents = list(map(list, [*zip(*refs_sents)])) # transpose from [# samples, # refs_per_sample] to [# refs_per_sample, # samples]
         else:
             refs_sents = [[ref] for ref in refs_sents]
-
-        # if isinstance(refs_sents[0], list):
-        #     refs_sents = list(map(list, [*zip(*refs_sents)])) # transpose from [# samples, # refs_per_sample] to [# refs_per_sample, # samples]
-        # else:
-        #     refs_sents = [[ref] for ref in refs_sents]
-        # log shape of references
-        logger.info(f"Loaded {len(refs_sents)} references.")
     else:
         refs_sents = None
- 
     # if args.stop_tokens is not None:
     #     sys_sents = [postprocess_text(s, args.stop_tokens, verbose=args.verbose) for s in sys_sents]
 
@@ -281,24 +294,24 @@ def main(args):
     metrics['lang_match'] = calculate_agreement(src_langs, sys_langs)
 
     metrics['tgt_lang'] = calculate_agreement([lid_model.get_long_tag(args.lang)]*len(sys_langs), sys_langs)
-    
-    # if args.use_cuda:
-    #     metrics['ppl'], metrics['ppl_model'] = compute_perplexity(sys_sents, lang=args.lang)
-    # else:
-    #     metrics['ppl'], metrics['ppl_model'] = None, None
+
+    if args.use_cuda:
+        metrics['ppl'], metrics['ppl_model'] = compute_perplexity(sys_sents, lang=args.lang)
+    else:
+        metrics['ppl'], metrics['ppl_model'] = None, None
 
     if refs_sents is not None:
         # compute BLEU, chrF
         # postprocess system outputs to take only the first sentence upto linebreak
         sys_sents = [s.split('\n')[0] for s in sys_sents]
-        # metrics.update(mt_metrics.compute(predictions=sys_sents, references=refs_sents, sources=src_sents))
         metrics['bleu'] = compute_bleu(predictions=sys_sents, references=refs_sents, lang=args.lang)
         metrics['chrf'] = compute_chrf(sys_sents, refs_sents, lang=args.lang)
-        metrics['sari'] = compute_sari(sys_sents, refs_sents, src_sents)
-        if args.use_cuda:
-            metrics['comet'] = compute_comet(sys_sents, refs_sents, src_sents)
-        else:
-            metrics['comet'] = None
+        metrics['sari'] = compute_sari(sys_sents, refs_sents, src_sents, lang=args.lang)
+
+    # compute BLEU and chrF against source texts
+    metrics['bleu-src'] = compute_bleu(predictions=sys_sents, references=[[s] for s in src_sents], lang=args.lang)
+    metrics['chrf-src'] = compute_chrf(sys_sents, [[s] for s in src_sents], lang=args.lang)
+
     # add filename
     metrics['n'] = len(sys_sents)
     metrics['file'] = args.input_file

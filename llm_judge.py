@@ -73,7 +73,7 @@ def set_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("--input_file", required=True, type=str, help="Path to input file")
     ap.add_argument("--output_file", required=False, type=str, help="Path to output file")
-    ap.add_argument("--output_dir_base", required=False, default='data/llm_judge', type=str, help="Path to output directory")
+    ap.add_argument("--output_dir_base", required=False, default='resources/outputs/llm_judge', type=str, help="Path to output directory")
     ap.add_argument("--eval_model_name", required=False, type=str, default="gpt-3.5-turbo-1106", help="Name of the model to use")
     ap.add_argument("--eval_type", required=False, type=str, default="likert", help="Evaluation type (abs|likert)")
     ap.add_argument("--verbose", action="store_true", default=False, help="Verbose")
@@ -130,7 +130,7 @@ if __name__ == "__main__":
         output_file = args.output_file
     
     elif args.output_dir_base:
-        # e.g. data/llm_evals/likert/gpt-3.5-turbo-1106/llama_2_7b_hf_de_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8-translated.jsonl
+        # e.g. resources/outputs/llm_judge/likert/gpt-3.5-turbo-1106/llama_2_7b_hf_de_merged/alpaca_eval_instructions_de-none-guanaco_prompt-s0-k50-p0.9-t0.8-b8-translated.jsonl
         output_dir = Path(args.output_dir_base) / f"{args.eval_type}" / args.eval_model_name / Path(args.input_file).parent.name
         output_file = Path(output_dir) / f"{Path(args.input_file).stem}-l{len(data)}-ds{args.data_seed}-as{args.api_seed}-{args.src_key}-{args.tgt_key}.jsonl"
     

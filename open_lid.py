@@ -27,6 +27,14 @@ class LIDModel:
         'isl_Latn': 'is',
         'hin_Deva': 'hi',
         'ell_Grek': 'el',
+        'slv_Latn': 'sl',
+        'jpn_Jpan': 'ja',
+        'vie_Latn': 'vi',
+        'kor_Hang': 'ko',
+        'bul_Cyrl': 'bg',
+        'swe_Latn': 'sv',
+        'hun_Latn': 'hu',
+        'fin_Latn': 'fi',
     }
 
     short_to_long = {v: k for k, v in long_to_short.items()}

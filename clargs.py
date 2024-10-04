@@ -109,6 +109,13 @@ def data_args_parser():
     )
 
     ap.add_argument(
+        "--orig_src_key",
+        type=str,
+        default=None,
+        help="Original source column for inference before prompt formatting if available",
+    )
+
+    ap.add_argument(
         "--tgt_key",
         type=str,
         default="answer", #  ProcessedAnswerText for MSQA

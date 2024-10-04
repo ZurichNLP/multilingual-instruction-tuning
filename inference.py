@@ -178,6 +178,10 @@ def main(args):
         if args.tgt_key and args.tgt_key in batch_lines[0]:
             ref_texts = [line[args.tgt_key] for line in batch_lines]
         
+        orig_src_texts = None
+        if args.orig_src_key and args.orig_src_key in batch_lines[0]:
+            orig_src_texts = [line[args.orig_src_key] for line in batch_lines]
+
         # Write predictions to file
         with open(output_file, 'a', encoding='utf-8') as f:
             
@@ -204,7 +208,10 @@ def main(args):
             end_time = time.time()
             # add the original source texts to the outputs dict
             for i, output_dict in enumerate(batch_outputs):
-                output_dict["source"] = input_texts[i]
+                if orig_src_texts:
+                    output_dict["orig_source"] = orig_src_texts[i]
+                else:
+                    output_dict["source"] = input_texts[i]
                 # output_dict["contexts"] = context_texts[i] if context_texts else None
                 output_dict["secs"] = ((end_time - start_time) / len(batch_outputs))
                 if ref_texts:

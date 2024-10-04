@@ -39,7 +39,7 @@ def parse_args():
     parser.add_argument("--description_dict_path", default=None)
     parser.add_argument("--check_integrity", action="store_true")
     parser.add_argument("--write_out", action="store_true", default=False)
-    parser.add_argument("--output_base_path", type=str, default="data/lm_eval_harness")
+    parser.add_argument("--output_base_path", type=str, default="resources/outputs/lm_eval_harness")
     parser.add_argument("--skip_fewshots", type=list, default=[])
     parser.add_argument("--debug", action="store_true")
     return parser.parse_args()

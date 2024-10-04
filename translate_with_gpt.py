@@ -23,7 +23,7 @@ Example call:
         --tgt_lang "English" \
         --src_key "system" \
         --model_name "gpt-3.5-turbo-1106" \
-        --original_prompts data/alpaca_eval_instructions_en.json --debug --force
+        --original_prompts data/alpaca_eval/alpaca_eval_instructions_en.json --debug --force
 
         
 
@@ -72,7 +72,7 @@ def set_args():
     ap.add_argument("--temperature", type=float, default=0.0)
     ap.add_argument("--force", action="store_true", help="Overwrite output file if it already exists")
     ap.add_argument("--dataset_type", type=str, default="alpaca_eval_outputs", choices=["alpaca_eval_outputs", "alpaca_eval_prompts"], help="'outputs' refers to the generated responses which we translate for direct vs. translation evaluation ablations. 'Prompts' refers to the original prompts that we translate into multiple target languages for evaluations.")
-    ap.add_argument("--original_prompts", default=None, type=str, help="Path to original prompts file if required, e.g. for Alpaca Eval: data/alpaca_eval_instructions_en.json")
+    ap.add_argument("--original_prompts", default=None, type=str, help="Path to original prompts file if required, e.g. for Alpaca Eval: data/alpaca_eval/alpaca_eval_instructions_en.json")
 
     return ap.parse_args()
 
